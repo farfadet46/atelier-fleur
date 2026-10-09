@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'Atelier des fleurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --sky:#CADDD2; --floor:#EEF1E6; --glow:rgba(255,248,228,.95);
+  --ink:#1F3129; --ink2:#586C61; --moss:#355842; --accent:#C4466D; --accent-ink:#fff; --butter:#E6B93A;
+  --panel:rgba(250,252,247,.84); --line:rgba(31,49,41,.13); --chip:#ffffff; --chip2:#F2F5EE;
+  --good:#2F7D4F; --bad:#B8453E; --shadow:0 14px 34px -16px rgba(31,49,41,.4);
+  --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky:#14201B; --floor:#26332D; --glow:rgba(140,170,140,.22);
+    --ink:#ECF2EA; --ink2:#A7B8AD; --moss:#9DCBAA; --accent:#EE86A7; --accent-ink:#2a0f19;
+    --panel:rgba(26,37,32,.86); --line:rgba(236,242,234,.13); --chip:#26352E; --chip2:#1F2C26;
+    --good:#86D09F; --bad:#F08A80; --shadow:0 14px 34px -16px rgba(0,0,0,.7); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky:#14201B; --floor:#26332D; --glow:rgba(140,170,140,.22);
+  --ink:#ECF2EA; --ink2:#A7B8AD; --moss:#9DCBAA; --accent:#EE86A7; --accent-ink:#2a0f19;
+  --panel:rgba(26,37,32,.86); --line:rgba(236,242,234,.13); --chip:#26352E; --chip2:#1F2C26;
+  --good:#86D09F; --bad:#F08A80; --shadow:0 14px 34px -16px rgba(0,0,0,.7); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 36%,var(--glow),transparent 72%),
+    linear-gradient(180deg,var(--sky),var(--floor));
+  overflow:hidden;-webkit-tap-highlight-color:transparent;
+}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c:active{cursor:grabbing}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Header */
+.top{position:fixed;top:calc(var(--st) + 14px);left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;z-index:5}
+.brand{font-family:'Gloock',Georgia,'Times New Roman',serif;font-size:30px;line-height:1;letter-spacing:-.01em}
+.stats{display:flex;gap:18px;font-size:14px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.stats strong{color:var(--ink);font-weight:700}
+#sMoney{font-family:'Gloock',Georgia,serif;font-size:22px;color:var(--ink)}
+.stats{align-items:baseline}
+.topr{display:flex;align-items:center;gap:16px}
+.shopbtn{pointer-events:auto;border:0;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px var(--line),var(--shadow);border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+.shopbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8}
+.shopbtn .badge{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.shopbtn .badge[hidden]{display:none}
+.fitem.locked .fcard{background:var(--chip2)}
+.fitem.locked img{filter:grayscale(.85);opacity:.5}
+.fitem.locked .fprice{color:var(--accent);font-weight:600}
+.sw.add{background:var(--chip2);color:var(--ink2);font-size:17px;line-height:1;display:grid;place-items:center;border:1.5px dashed var(--ink2);box-shadow:none}
+.sheet.shop{width:min(800px,100%);padding:24px 24px 22px}
+.shop-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.shop-head h2{margin:0!important;flex:1;font-size:30px!important}
+.wallet{font-family:'Gloock',Georgia,serif;font-size:26px;font-variant-numeric:tabular-nums}
+.close{border:0;background:var(--chip2);width:38px;height:38px;border-radius:50%;font-size:22px;line-height:1;flex:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:0;background:transparent;padding:8px 14px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--floor);box-shadow:none}
+.shop-note{font-size:13.5px;color:var(--ink2);margin:10px 0 14px!important}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.scard{background:var(--chip);border-radius:18px;box-shadow:0 0 0 1px var(--line);padding:12px;display:flex;flex-direction:column;gap:6px}
+.scard .th{height:96px;display:grid;place-items:center;background:var(--chip2);border-radius:12px;overflow:hidden}
+.scard .th img{width:92px;height:92px}
+.scard .swb{width:52px;height:52px;border-radius:50%;box-shadow:0 0 0 1px var(--line),inset 0 -6px 10px rgba(0,0,0,.12)}
+.scard .big{font-family:'Gloock',Georgia,serif;font-size:28px;letter-spacing:-.01em}
+.scard strong{font-size:15px}
+.scard p{margin:0;font-size:13px;line-height:1.4;color:var(--ink2);flex:1}
+.scard .lvl{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.scard .btn{margin-top:4px;width:100%;padding:10px 12px;font-size:14px}
+.scard.owned .btn{background:transparent;color:var(--good);box-shadow:inset 0 0 0 1px var(--line);opacity:1}
+
+/* Panels */
+.panel{position:fixed;background:var(--panel);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid var(--line);box-shadow:var(--shadow);z-index:4}
+.order{top:calc(var(--st) + 66px);left:20px;width:310px;border-radius:24px;padding:16px 18px 14px;max-height:calc(100% - var(--st) - var(--sb) - 250px);overflow:auto}
+.order.arrive{animation:arrive .55s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes arrive{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.order-head{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:0;text-align:left}
+.avatar{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:'Gloock',Georgia,serif;font-size:20px;color:#fff}
+.who{display:flex;flex-direction:column;flex:1;min-width:0}
+.who strong{font-size:17px}
+.who span{font-size:13.5px;color:var(--ink2)}
+.prog{font-size:13px;font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap}
+blockquote{margin:12px 0 10px;font-family:'Gloock',Georgia,serif;font-size:17px;line-height:1.42;color:var(--ink)}
+.checks{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid var(--line);display:grid;gap:7px}
+.checks li{display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:8px;font-size:14px;line-height:1.3}
+.checks .ic{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;transition:background .25s,border-color .25s}
+.checks li.ok .ic{background:var(--good);border-color:var(--good);color:#fff}
+.checks li.warn .ic{border-color:var(--bad)}
+.checks .v{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.checks li.warn .v{color:var(--bad);font-weight:600}
+.free-note{font-size:14px;line-height:1.5;color:var(--ink2);margin:10px 0 12px}
+
+.tools{top:50%;right:20px;transform:translateY(-58%);width:228px;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.group{display:flex;flex-direction:column;gap:8px}
+.glabel{font-size:13px;font-weight:600;color:var(--ink2)}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--chip);box-shadow:0 0 0 1px var(--line);padding:0;transition:transform .15s}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink);transform:scale(1.08)}
+.sel{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--chip2);border-radius:12px;padding:8px 8px 8px 12px;font-size:13.5px}
+.sel[hidden]{display:none}
+.acts{display:flex;gap:8px}
+.acts .btn{flex:1}
+.tally{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);font-variant-numeric:tabular-nums;padding:0 2px}
+.tally strong{color:var(--ink)}
+.btn{border:0;border-radius:999px;padding:12px 18px;font-weight:600;font-size:15px;transition:transform .12s,background .2s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--moss);color:var(--floor)}
+:root .btn.primary{color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#13201a}}
+:root[data-theme="dark"] .btn.primary{color:#13201a}
+.btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:var(--chip2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.small{padding:8px 12px;font-size:13.5px}
+.btn.rose{background:var(--accent);color:var(--accent-ink)}
+
+/* Tray */
+.dock{position:fixed;left:16px;right:16px;bottom:calc(var(--sb) + 16px);display:flex;gap:10px;align-items:stretch;justify-content:center;z-index:4;pointer-events:none}
+.dock>*{pointer-events:auto}
+.dock .panel{position:relative}
+.trayWrap{flex:0 1 auto;min-width:0;border-radius:26px;display:flex;align-items:center;gap:4px;padding:8px 6px}
+.tray{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 4px 12px;min-width:0;cursor:grab;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--ink2) transparent;touch-action:pan-x}
+.tray::-webkit-scrollbar{height:6px}
+.tray::-webkit-scrollbar-track{background:var(--line);border-radius:6px;margin:0 8px}
+.tray::-webkit-scrollbar-thumb{background:var(--ink2);border-radius:6px}
+.tray.over{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent)}
+.tray.dragging{cursor:grabbing}
+.tray.dragging .fitem{pointer-events:none}
+.tarrow{flex:none;width:34px;height:64px;border:0;border-radius:14px;background:var(--chip2);box-shadow:inset 0 0 0 1px var(--line);font-size:26px;line-height:1;display:grid;place-items:center;align-self:center;margin-bottom:10px}
+.tarrow:disabled{opacity:.3;cursor:default}
+.trayWrap.fits .tarrow{display:none}
+.sell{flex:none;width:210px;border-radius:26px;padding:14px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.sell .btn{width:100%}
+.fitem{flex:none;width:94px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fcard{width:100%;border:0;background:var(--chip);border-radius:16px;padding:6px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 0 0 1px var(--line);transition:transform .15s,box-shadow .15s}
+.fcard:hover{transform:translateY(-3px);box-shadow:0 0 0 1px var(--line),0 10px 18px -10px rgba(31,49,41,.45)}
+.fcard img{width:66px;height:66px;display:block;pointer-events:none}
+.fname{font-size:13.5px;font-weight:600}
+.fprice{font-size:12px;color:var(--ink2)}
+.dots{display:flex;gap:4px;min-height:14px;justify-content:center;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;padding:0;border:1.5px solid var(--chip);box-shadow:0 0 0 1px var(--line)}
+.dot[aria-pressed="true"]{box-shadow:0 0 0 1.5px var(--ink)}
+
+.hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sb) + 186px);font-size:14px;color:var(--ink2);background:var(--panel);border:1px solid var(--line);padding:8px 14px;border-radius:999px;z-index:3;transition:opacity .5s;pointer-events:none;white-space:nowrap}
+.hint.gone{opacity:0}
+.toast{position:fixed;left:50%;top:calc(var(--st) + 70px);transform:translate(-50%,-10px);background:var(--ink);color:var(--floor);padding:10px 16px;border-radius:14px;font-size:14px;opacity:0;transition:opacity .25s,transform .25s;z-index:30;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;display:grid;place-items:center;z-index:20;background:rgba(20,32,27,.28);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:20px}
+.overlay[hidden]{display:none}
+.sheet{background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:30px 30px 26px;width:min(460px,100%);max-height:calc(100% - var(--st) - var(--sb));overflow:auto;animation:pop .45s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.intro h1{font-family:'Gloock',Georgia,serif;font-weight:400;font-size:clamp(46px,11vw,68px);line-height:.92;margin:0 0 18px;letter-spacing:-.02em}
+.intro p{font-size:16px;line-height:1.55;color:var(--ink2);margin:0 0 22px;max-width:36em}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.record{font-size:13.5px!important;margin:18px 0 0!important}
+.stars{display:flex;justify-content:center;gap:8px;margin:4px 0 14px}
+.stars svg{width:48px;height:48px}
+.stars path{fill:var(--line);stroke:none;transition:fill .3s}
+.stars .lit path{fill:var(--butter)}
+.stars .lit{animation:starpop .5s cubic-bezier(.2,.9,.3,1.5) both}
+@keyframes starpop{from{transform:scale(.3) rotate(-30deg)}to{transform:none}}
+.reaction{font-family:'Gloock',Georgia,serif;font-size:21px;line-height:1.35;text-align:center;margin:0 0 16px}
+.reaction small{display:block;font-family:'Figtree',sans-serif;font-size:13.5px;color:var(--ink2);margin-top:6px}
+.breakdown{list-style:none;padding:12px 0;margin:0 0 14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;gap:7px;font-size:14px}
+.breakdown li{display:flex;justify-content:space-between;gap:10px}
+.breakdown .r-ok{color:var(--good);font-weight:600}
+.breakdown .r-ko{color:var(--bad);font-weight:600}
+.earn{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
+#earn{font-family:'Gloock',Georgia,serif;font-size:34px}
+.scoreline{font-size:14px;color:var(--ink2)}
+.sheet .btn.primary{width:100%}
+.sheet .row .btn{flex:1}
+.sheet h2{font-family:'Gloock',Georgia,serif;font-weight:400;font-size:36px;margin:0 0 14px;line-height:1.05}
+.bigsum{display:flex;flex-direction:column;margin-bottom:12px}
+.bigsum span:first-child{font-family:'Gloock',Georgia,serif;font-size:54px;line-height:1}
+.bigsum span:last-child{color:var(--ink2)}
+.sheet p{line-height:1.5}
+
+/* Mobile */
+@media (max-width:760px){
+  .top{left:14px;right:14px;top:calc(var(--st) + 10px)}
+  .brand{font-size:19px}
+  .stats{gap:12px;font-size:12.5px}
+  #sMoney{font-size:18px}
+  #sClient .long{display:none}
+  .order{left:10px;right:10px;width:auto;top:calc(var(--st) + 44px);padding:10px 14px;border-radius:20px;max-height:46vh}
+  .avatar{width:34px;height:34px;font-size:17px}
+  .who strong{font-size:15px}
+  .order.collapsed .checks,.order.collapsed .free-actions{display:none}
+  .dock{left:10px;right:10px;bottom:calc(var(--sb) + 10px);flex-direction:column-reverse;gap:8px}
+  .trayWrap{padding:6px 4px;border-radius:22px}
+  .tray{gap:6px}
+  .tarrow{display:none}
+  .sell{width:auto;flex-direction:row;align-items:center;padding:8px 8px 8px 16px;border-radius:20px;gap:12px}
+  .sell .tally{flex:1;justify-content:flex-start;gap:14px}
+  .sell .btn{width:auto;padding:11px 18px}
+  .fitem{width:74px}
+  .fcard img{width:50px;height:50px}
+  .fname{font-size:12px}
+  .tools{top:auto;transform:none;left:10px;right:10px;width:auto;bottom:calc(var(--sb) + 150px);border-radius:20px;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tools .group{gap:5px}
+  .glabel{font-size:12px}
+  .sw{width:24px;height:24px}
+  .swatches{gap:6px}
+  .sel{grid-column:1/-1}
+  .acts{grid-column:1/-1}
+  #sDay{display:none}
+  .topr{gap:10px}
+  .shopbtn{padding:8px 12px;font-size:13px}
+  .sheet.shop{padding:18px 14px}
+  .shop-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .scard .th{height:78px}
+  .scard .th img{width:74px;height:74px}
+  .hint{bottom:calc(var(--sb) + 272px);font-size:13px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Bouquet en 3D : faites glisser pour tourner, touchez une fleur pour la sélectionner"></canvas>
+
+<header class="top">
+  <div class="brand">L'Atelier des fleurs</div>
+  <div class="topr">
+    <div class="stats"><span id="sDay">Jour 1</span><span id="sClient">Client 1<span class="long"> sur 5</span></span><span id="sMoney" title="Caisse">0 €</span></div>
+    <button class="shopbtn" id="openShop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l-1.4 11.2a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8L4 7z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Catalogue<span class="badge" id="shopBadge" hidden></span></button>
+  </div>
+</header>
+
+<aside class="panel order" id="order">
+  <button class="order-head" id="orderToggle" aria-expanded="true">
+    <span class="avatar" id="avatar">C</span>
+    <span class="who"><strong id="cName"></strong><span id="cOcc"></span></span>
+    <span class="prog" id="prog"></span>
+  </button>
+  <ul class="checks" id="checks"></ul>
+  <div class="free-actions" id="freeActions" hidden><button class="btn ghost small" id="backShop">Retour à la boutique</button></div>
+</aside>
+
+<aside class="panel tools" id="tools">
+  <div class="group"><span class="glabel">Vase</span><div class="swatches" id="vases"></div></div>
+  <div class="group"><span class="glabel">Emballage, sans vase</span><div class="swatches" id="wraps"></div></div>
+  <div class="group"><span class="glabel">Ruban</span><div class="swatches" id="ribbons"></div></div>
+  <div class="sel" id="sel" hidden><span id="selName"></span><button class="btn small rose" id="removeSel">Retirer</button></div>
+  <div class="acts"><button class="btn small ghost" id="undo">Annuler</button><button class="btn small ghost" id="clear">Vider</button></div>
+</aside>
+
+<div class="dock" id="dock">
+  <div class="panel trayWrap" id="trayWrap">
+    <button class="tarrow" id="tLeft" aria-label="Fleurs précédentes">‹</button>
+    <nav class="tray" id="tray" aria-label="Fleurs disponibles"></nav>
+    <button class="tarrow" id="tRight" aria-label="Fleurs suivantes">›</button>
+  </div>
+  <div class="panel sell">
+    <div class="tally"><span id="tStems"><strong>0</strong> tige</span><span id="tCost"><strong>0 €</strong></span></div>
+    <button class="btn primary" id="deliver" disabled>Vendre le bouquet</button>
+  </div>
+</div>
+<div class="hint" id="hint">Touchez une fleur pour l'ajouter, glissez pour tourner</div>
+<div class="toast" id="toast" role="status"></div>
+
+<div class="overlay" id="intro">
+  <div class="sheet intro">
+    <h1>L'Atelier<br>des fleurs</h1>
+    <p>Chaque client arrive avec une envie. Composez son bouquet tige par tige, choisissez le vase et le ruban, puis vendez-le. Avec la recette, achetez de nouvelles fleurs, des vases, de la décoration et des améliorations dans le catalogue.</p>
+    <div class="row"><button class="btn primary" id="startShop">Ouvrir la boutique</button><button class="btn ghost" id="startFree">Composer librement</button></div>
+    <p class="record" id="record"></p>
+  </div>
+</div>
+
+<div class="overlay" id="result" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="reaction">
+    <div class="stars" id="stars"></div>
+    <p class="reaction" id="reaction"></p>
+    <ul class="breakdown" id="breakdown"></ul>
+    <div class="earn"><span id="earn">+0 €</span><span class="scoreline" id="scoreline"></span></div>
+    <button class="btn primary" id="next">Client suivant</button>
+  </div>
+</div>
+
+<div class="overlay" id="summary" hidden>
+  <div class="sheet" role="dialog">
+    <h2>La boutique ferme</h2>
+    <div class="bigsum"><span id="sumMoney">0 €</span><span>de recette aujourd'hui</span></div>
+    <p id="sumStars"></p>
+    <p id="sumRecord" style="color:var(--ink2);margin-top:0"></p>
+    <p id="sumWallet" style="margin-top:0"></p>
+    <div class="row"><button class="btn primary" id="newDay">Nouvelle journée</button><button class="btn ghost" id="sumShop">Ouvrir le catalogue</button></div>
+    <div class="row" style="margin-top:10px"><button class="btn ghost" id="toFree">Composer librement</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="shop" hidden>
+  <div class="sheet shop" role="dialog" aria-labelledby="shopTitle">
+    <div class="shop-head"><h2 id="shopTitle">Catalogue</h2><span class="wallet" id="wallet">0 €</span><button class="close" id="shopClose" aria-label="Fermer le catalogue">×</button></div>
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-tab="fleurs">Fleurs</button>
+      <button class="tab" role="tab" data-tab="vases">Vases et emballages</button>
+      <button class="tab" role="tab" data-tab="decor">Décoration</button>
+      <button class="tab" role="tab" data-tab="up">Améliorations</button>
+    </div>
+    <p class="shop-note" id="shopNote"></p>
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+const TAU = Math.PI * 2, UP = new THREE.Vector3(0, 1, 0);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = s => document.querySelector(s);
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hexCss = h => '#' + h.toString(16).padStart(6, '0');
+
+/* ---------- Données ---------- */
+const FAM = {
+  rouge:{n:'rouge',f:'rouges'}, rose:{n:'rose',f:'roses'}, blanc:{n:'blanc',f:'blanches'},
+  jaune:{n:'jaune',f:'jaunes'}, orange:{n:'pêche',f:'pêche'}, violet:{n:'violet',f:'violettes'},
+  bleu:{n:'bleu',f:'bleues'}, vert:{n:'vert',f:'vertes'}
+};
+const FLOWERS = {
+  rose:{name:'Rose', pl:'roses', price:4, prio:0, len:.44, view:'top', r:.1, off:.04,
+    colors:[['rouge',0xB5162F],['rose',0xF08DAE],['blanc',0xF6F1EA],['jaune',0xF3CD4A],['orange',0xF5A57E]]},
+  pivoine:{name:'Pivoine', pl:'pivoines', price:6, prio:0, len:.41, view:'top', r:.13, off:.04,
+    colors:[['rose',0xF2A0BA],['blanc',0xFAEFEF],['orange',0xF08A78]]},
+  tulipe:{name:'Tulipe', pl:'tulipes', price:3, prio:1, len:.47, view:'side', r:.07, off:.07,
+    colors:[['rouge',0xD2233C],['rose',0xF39AB8],['jaune',0xF6D352],['violet',0x7D4CAA],['blanc',0xF7F4EE]]},
+  hortensia:{name:'Hortensia', pl:'hortensias', price:5, prio:0, len:.38, view:'top', r:.12, off:.08,
+    colors:[['bleu',0x8DB3E6],['rose',0xEBA6C8],['blanc',0xEEF1F3],['violet',0xA48BD6]]},
+  tournesol:{name:'Tournesol', pl:'tournesols', price:4, prio:0, len:.46, view:'top', r:.15, off:.02,
+    colors:[['jaune',0xF4C430]]},
+  marguerite:{name:'Marguerite', pl:'marguerites', price:2, prio:1, len:.48, view:'top', r:.11, off:.01,
+    colors:[['blanc',0xFBFBF8]]},
+  lavande:{name:'Lavande', pl:'lavandes', price:2, prio:2, len:.44, view:'side', r:.045, off:.12,
+    colors:[['violet',0x8E73C9]]},
+  gypsophile:{name:'Gypsophile', pl:'gypsophiles', price:2, prio:2, len:.43, view:'side', r:.1, off:.1,
+    colors:[['blanc',0xFFFFFF]]},
+  eucalyptus:{name:'Eucalyptus', pl:'eucalyptus', price:2, prio:3, len:.38, view:'side', r:.08, off:.15,
+    colors:[['vert',0x7FA597]]},
+  renoncule:{name:'Renoncule', pl:'renoncules', price:4, prio:1, len:.45, view:'top', r:.08, off:.03,
+    colors:[['orange',0xF4935B],['rose',0xF4A6B8],['blanc',0xF7F2E8],['jaune',0xF5D35A],['rouge',0xC8283A]]},
+  anemone:{name:'Anémone', pl:'anémones', price:4, prio:1, len:.47, view:'top', r:.1, off:.01,
+    colors:[['blanc',0xF8F6F2],['rouge',0xC3203A],['violet',0x6E4AA3],['bleu',0x5E78C9]]},
+  orchidee:{name:'Orchidée', pl:'orchidées', price:7, prio:0, len:.46, view:'top', r:.13, off:0,
+    colors:[['blanc',0xFBF8F8],['rose',0xEC8FC0],['violet',0x9A5BB5]]}
+};
+const UNLOCK = {tournesol:40, pivoine:60, hortensia:80, renoncule:90, anemone:110, orchidee:150};
+const FDESC = {
+  tournesol:"Un soleil sur une tige, pour les bouquets joyeux.",
+  pivoine:"Généreuse et parfumée, la reine des bouquets.",
+  hortensia:"Une boule de fleurs en bleu, rose, blanc ou mauve.",
+  renoncule:"Des pétales serrés en couches, comme du papier de soie.",
+  anemone:"De larges pétales autour d'un cœur sombre.",
+  orchidee:"Élégante, pour les commandes les plus chics."
+};
+const UPG = {
+  stems:{name:'Plan de travail agrandi', vals:[25,30,35], cost:[60,120], show:v => `${v} tiges`,
+    desc:(a,b) => `Passez de ${a} à ${b} tiges par bouquet.`, done:'Le plan de travail est à sa taille maximale.'},
+  gros:{name:'Grossiste en fleurs', vals:[0,.1,.2], cost:[70,140], show:v => `−${Math.round(v*100)} %`,
+    desc:(a,b) => `Toutes les fleurs coûtent ${Math.round(b*100)} % de moins. Les budgets deviennent plus faciles à tenir.`, done:'Vous avez déjà le meilleur tarif.'},
+  tips:{name:'Service soigné', vals:[5,10,15], cost:[40,90], show:v => `+${v} €`,
+    desc:(a,b) => `Le pourboire d'un bouquet 3 étoiles passe de ${a} € à ${b} €.`, done:'Votre service est irréprochable.'},
+  clients:{name:'Bouche-à-oreille', vals:[5,6,7], cost:[80,160], show:v => `${v} clients`,
+    desc:(a,b) => `${b} clients par journée au lieu de ${a}.`, done:'La boutique ne désemplit pas.'}
+};
+const DECOR = [
+  {id:'ficelle', name:'Ficelle et sécateur', desc:"Les outils du métier, posés sur la table.", price:20, pos:[.5,0,.5,0]},
+  {id:'nappe', name:'Nappe en lin', desc:"Une nappe écrue sous le vase.", price:30, pos:[0,0,0,0]},
+  {id:'arrosoir', name:'Arrosoir en zinc', desc:"Pour garder les tiges bien fraîches.", price:35, pos:[-.82,0,-.32,.8]},
+  {id:'plante', name:'Plante en pot', desc:"Un grand feuillage dans un pot en terre.", price:40, pos:[.78,0,-.55,0]},
+  {id:'bougies', name:'Bougies', desc:"Trois bougies et leur lumière dorée.", price:45, pos:[-.66,0,.48,0]},
+  {id:'guirlande', name:'Guirlande lumineuse', desc:"Des petites ampoules tout autour de la table.", price:70, pos:[0,0,0,0]}
+];
+const TYPES = Object.keys(FLOWERS);
+const VASES = [
+  {id:'porcelaine', name:'porcelaine', hex:0xF0EEE8, price:0, desc:"Blanc et sobre, il va avec tout."},
+  {id:'celadon', name:'céladon', hex:0x9FC3AE, price:25, desc:"Un vert d'eau très doux."},
+  {id:'argile', name:'argile', hex:0xB8694E, price:30, desc:"Chaud et un peu rustique."},
+  {id:'poudre', name:'rose poudré', hex:0xE5B3B2, price:30, desc:"Tendre, pour les bouquets romantiques."},
+  {id:'nuit', name:'bleu nuit', hex:0x2D3C63, price:35, desc:"Profond, il fait ressortir les couleurs claires."},
+  {id:'verre', name:'en verre', hex:0xDDEBE6, price:60, rough:.05, opacity:.32, desc:"Transparent : on voit les tiges plonger dans l'eau."},
+  {id:'dore', name:'doré', hex:0xC9A24A, price:80, rough:.3, metal:.7, desc:"Un éclat doré pour les grandes occasions."}
+];
+const WRAPS = [
+  {id:'kraft', name:'kraft', hex:0xB98A55, price:0, rough:.95, css:'#B98A55', desc:"Le classique du fleuriste, brut et chaleureux."},
+  {id:'cello', name:'cellophane', hex:0xEAF6F4, price:10, rough:.06, opacity:.3, css:'linear-gradient(135deg,#fff 0%,#cfe6e3 45%,#fff 55%,#dcefed 100%)', desc:"Transparent et brillant : les fleurs restent bien visibles."},
+  {id:'soie', name:'papier de soie', hex:0xF6F1EA, price:18, rough:.9, opacity:.93, css:'#F6F1EA', desc:"Blanc et léger, froissé avec délicatesse."},
+  {id:'rose', name:'papier rose', hex:0xEDB9C6, price:18, rough:.85, css:'#EDB9C6', desc:"Tendre, pour les bouquets romantiques."},
+  {id:'noir', name:'papier noir', hex:0x2B2B2E, price:25, rough:.7, css:'#2B2B2E', desc:"Élégant, il fait éclater les couleurs vives."}
+];
+const RIBBONS = [
+  {id:'blanc', name:'Satin blanc', hex:0xF4F1EA, price:0},
+  {id:'rose', name:'Rose', hex:0xE88AA8, price:0},
+  {id:'sauge', name:'Sauge', hex:0x8FAE93, price:12},
+  {id:'lavande', name:'Lavande', hex:0xB7A3DB, price:12},
+  {id:'or', name:'Or', hex:0xD4AA4F, price:15},
+  {id:'bordeaux', name:'Bordeaux', hex:0x7A1F33, price:15},
+  {id:'noir', name:'Velours noir', hex:0x26262B, price:20}
+];
+const ORDERS = [
+  {name:'Camille', occ:'Mariage champêtre', color:'#C9A24A',
+   text:"Pour la table des mariés. Du blanc, une touche de jaune, et des marguerites : ça doit sentir le jardin.",
+   palette:['blanc','jaune'], req:[{t:'marguerite',n:3}], min:10, max:18, green:true, budget:45, vase:'porcelaine'},
+  {name:'Hugo', occ:'Saint-Valentin', color:'#B5162F',
+   text:"Des roses rouges, au moins cinq. Et surtout pas de jaune, elle trouve ça triste.",
+   palette:['rouge','rose'], req:[{t:'rose',c:'rouge',n:5}], avoid:['jaune'], min:7, max:15, budget:50},
+  {name:'Inès', occ:"Visite à l'hôpital", color:'#E0A51E',
+   text:"C'est pour mon grand-père. Il faut que ça ressemble à un après-midi d'été, avec des tournesols.",
+   palette:['jaune','orange'], req:[{t:'tournesol',n:2}], min:6, max:12, green:true, budget:35},
+  {name:'Margaux', occ:'Souvenir de Provence', color:'#7E66B8',
+   text:"On rentre de Provence et ça me manque déjà. Violet et blanc, beaucoup de lavande.",
+   palette:['violet','blanc'], req:[{t:'lavande',n:4}], min:8, max:16, green:true, budget:32, vase:'celadon'},
+  {name:'Léo', occ:'Anniversaire de maman', color:'#D8739A',
+   text:"Elle adore les pivoines. Des tons roses ou pêche, rien de trop criard.",
+   palette:['rose','orange'], req:[{t:'pivoine',n:2}], avoid:['rouge'], min:7, max:14, budget:45},
+  {name:'Nour', occ:'Pendaison de crémaillère', color:'#4F6FA8',
+   text:"Leur salon est tout bleu et blanc. Il faudrait des hortensias, dans un vase bleu nuit.",
+   palette:['bleu','blanc'], req:[{t:'hortensia',n:2}], min:6, max:12, budget:40, vase:'nuit'},
+  {name:'Paul', occ:'Des excuses', color:'#6E7F77',
+   text:"J'ai oublié notre anniversaire. Quelque chose de sincère, tout en blanc. Pas de rouge, ce serait déplacé.",
+   palette:['blanc'], req:[{t:'tulipe',n:3}], avoid:['rouge'], min:8, max:14, budget:35, wrap:'soie'},
+  {name:'Sofia', occ:'Premier jour du printemps', color:'#E48BB0',
+   text:"Plein de tulipes aux couleurs tendres, et un peu de vert pour la fraîcheur.",
+   palette:['rose','jaune','violet','blanc'], req:[{t:'tulipe',n:5}], min:9, max:18, green:true, budget:42},
+  {name:'Jeanne', occ:'Remise de diplôme', color:'#D2562E',
+   text:"Quelque chose de chaud et flamboyant : rouge, pêche, jaune. Au moins deux roses.",
+   palette:['rouge','orange','jaune'], req:[{t:'rose',n:2}], min:8, max:15, budget:38, wrap:'kraft'},
+  {name:'Élise', occ:'Un bureau minimaliste', color:'#8FA79A',
+   text:"Trois à six tiges, blanc et vert. Dans un vase en porcelaine, rien de plus.",
+   palette:['blanc'], req:[], min:3, max:6, green:true, budget:20, vase:'porcelaine'},
+  {name:'Antoine', occ:'Fête des grands-mères', color:'#9A74C4',
+   text:"Mamie aime le rose et le mauve. Un hortensia, quelques tulipes, et un joli vase poudré.",
+   palette:['rose','violet'], req:[{t:'hortensia',n:1},{t:'tulipe',n:2}], min:7, max:14, budget:42, vase:'poudre'},
+  {name:'Chloé', occ:'Dîner entre amis', color:'#D8B236',
+   text:"Une table joyeuse : jaune, blanc et une note de bleu. Un tournesol au milieu, ce serait parfait.",
+   palette:['jaune','blanc','bleu'], req:[{t:'tournesol',n:1}], min:6, max:12, budget:30, vase:'celadon'},
+  {name:'Lucie', occ:'Atelier de peinture', color:'#5E78C9',
+   text:"Des anémones pour mes élèves, dans des bleus et des violets.",
+   palette:['bleu','violet','blanc'], req:[{t:'anemone',n:3}], min:6, max:12, budget:45},
+  {name:'Mathis', occ:'Vernissage chic', color:'#9A5BB5',
+   text:"Des orchidées, peu de tiges mais beaucoup d'allure, dans un vase doré.",
+   palette:['blanc','violet'], req:[{t:'orchidee',n:2}], min:5, max:10, budget:60, vase:'dore'},
+  {name:'Yasmine', occ:'Brunch du dimanche', color:'#F4935B',
+   text:"Des renoncules pêche et jaunes, quelque chose de frais et gourmand.",
+   palette:['orange','jaune','blanc'], req:[{t:'renoncule',n:4}], min:8, max:15, green:true, budget:45},
+  {name:'Bastien', occ:'Mariage sous verrière', color:'#C98FA0',
+   text:"Des pivoines blanches et roses dans un vase en verre, beaucoup de verdure.",
+   palette:['blanc','rose'], req:[{t:'pivoine',n:2}], min:10, max:18, green:true, budget:60, vase:'verre'}
+];
+ORDERS.push(
+  {name:'Théo', occ:'Premier rendez-vous', color:'#E0607E',
+   text:"Quelques roses, pas trop, emballées dans de la cellophane.",
+   palette:['rose','rouge','blanc'], req:[{t:'rose',n:3}], min:5, max:11, budget:35, wrap:'cello'},
+  {name:'Clara', occ:'Fête des voisins', color:'#B98A55',
+   text:"Un bouquet simple et gai, dans du papier kraft.",
+   palette:['jaune','blanc'], req:[{t:'marguerite',n:3}], min:7, max:14, green:true, budget:25, wrap:'kraft'},
+  {name:'Victor', occ:'Soirée de gala', color:'#2B2B2E',
+   text:"Du rouge profond dans un papier noir. Il faut que ça claque.",
+   palette:['rouge'], req:[{t:'rose',n:5}], min:7, max:14, budget:55, wrap:'noir'}
+);
+const REACT = {
+  3:["C'est exactement ce que j'imaginais.","Oh… il est magnifique. Merci infiniment.","Parfait. Je reviendrai, c'est certain."],
+  2:["Très joli, même si ce n'est pas tout à fait ce que j'avais en tête.","Ça me plaît beaucoup, merci.","Joli travail, il y a juste un détail qui me chiffonne."],
+  1:["Hmm… je vais le prendre quand même.","Ce n'est pas vraiment ce que j'avais demandé.","Bon. Il fera l'affaire."],
+  0:["Ce n'est pas du tout ce que j'avais demandé.","Je crois qu'on ne s'est pas compris.","Je préfère repasser un autre jour."]
+};
+
+/* ---------- Rendu ---------- */
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(36, 1, .05, 40);
+
+scene.add(new THREE.HemisphereLight(0xEAF3FF, 0xB69C7C, .85));
+const sun = new THREE.DirectionalLight(0xFFF0DA, 1.25);
+sun.position.set(1.8, 3.6, 2.2);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, {left:-1.2, right:1.2, top:1.6, bottom:-1, near:.5, far:9});
+sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.bias = -.0006; sun.shadow.normalBias = .02;
+scene.add(sun);
+const rim = new THREE.DirectionalLight(0xCFE3FF, .45);
+rim.position.set(-2, 1.8, -2.2); scene.add(rim);
+
+const C = h => new THREE.Color(h).convertSRGBToLinear();
+const MC = {};
+function M(hex, rough = .58){
+  const k = hex + '_' + rough;
+  if (!MC[k]) MC[k] = new THREE.MeshStandardMaterial({color:C(hex), roughness:rough, metalness:0, side:THREE.DoubleSide});
+  return MC[k];
+}
+function shade(hex, k){
+  const r = (hex >> 16) & 255, g = (hex >> 8) & 255, b = hex & 255;
+  return (Math.round(clamp(r*k,0,255)) << 16) | (Math.round(clamp(g*k,0,255)) << 8) | Math.round(clamp(b*k,0,255));
+}
+function mix(hex, to, t){
+  const a = [(hex>>16)&255,(hex>>8)&255,hex&255], b = [(to>>16)&255,(to>>8)&255,to&255];
+  const c = a.map((v,i) => Math.round(v + (b[i]-v)*t));
+  return (c[0]<<16)|(c[1]<<8)|c[2];
+}
+
+/* ---------- Géométrie des fleurs ---------- */
+const GC = {};
+function petalGeo(w, h, cup, curl){
+  const key = 'p' + [w,h,cup,curl].join('_');
+  if (GC[key]) return GC[key];
+  const g = new THREE.PlaneGeometry(w, h, 5, 7);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++){
+    let x = p.getX(i); const y = p.getY(i) + h/2, ny = y/h;
+    const wf = .18 + .82 * Math.pow(Math.sin(Math.PI * Math.min(.97, Math.pow(ny, .8))), .5);
+    x *= wf;
+    const nx = x / (w/2);
+    const z = -cup*nx*nx*w*.45 - cup*.12*h*Math.sin(ny*Math.PI) + curl*ny*ny*h*.55;
+    p.setXYZ(i, x, y, z);
+  }
+  g.computeVertexNormals();
+  return GC[key] = g;
+}
+function sphereGeo(r, ws = 8, hs = 6){ const k='s'+r+'_'+ws; return GC[k] || (GC[k] = new THREE.SphereGeometry(r, ws, hs)); }
+function cylGeo(r1, r2, h){ const k='c'+[r1,r2,h].join('_'); if(!GC[k]){ GC[k]=new THREE.CylinderGeometry(r1,r2,h,6,1); GC[k].translate(0,h/2,0);} return GC[k]; }
+function addPetal(group, geo, mat, phi, tilt, r, y){
+  const m = new THREE.Mesh(geo, mat);
+  m.rotation.order = 'YXZ';
+  m.rotation.set(tilt, phi, 0);
+  m.position.set(Math.sin(phi)*r, y, Math.cos(phi)*r);
+  m.castShadow = true;
+  group.add(m);
+  return m;
+}
+function mesh(geo, mat, parent){ const m = new THREE.Mesh(geo, mat); m.castShadow = true; parent.add(m); return m; }
+const LEAF = 0x5E8F4E, STEM = 0x5A8248;
+function sepals(g, n, y){
+  const geo = petalGeo(.02, .05, .3, .2), m = M(LEAF);
+  for (let i = 0; i < n; i++) addPetal(g, geo, m, i/n*TAU + .3, 2.2, .012, y);
+}
+
+const BUILD = {
+  rose(hex){
+    const g = new THREE.Group();
+    const dark = M(shade(hex,.72)), mid = M(shade(hex,.86)), base = M(hex), light = M(mix(hex,0xffffff,.12));
+    [[3,.05,.07,1.3,0,.06,.004,dark,0],[4,.065,.08,1,.1,.28,.01,dark,-.004],[5,.08,.085,.85,.25,.58,.018,mid,-.008],
+     [6,.09,.085,.7,.45,.95,.024,base,-.012],[7,.095,.08,.55,.65,1.28,.028,light,-.016]]
+    .forEach(([n,w,h,cup,curl,tilt,r,m,y],k) => { const geo = petalGeo(w,h,cup,curl); for (let i=0;i<n;i++) addPetal(g,geo,m,i/n*TAU+k*.9,tilt,r,y); });
+    sepals(g, 5, -.018);
+    return g;
+  },
+  pivoine(hex){
+    const g = new THREE.Group();
+    const cols = [shade(hex,.8), shade(hex,.9), hex, hex, mix(hex,0xffffff,.1), mix(hex,0xffffff,.2)];
+    [5,7,9,10,12,13].forEach((n,k) => {
+      const geo = petalGeo(.05+.012*k, .055+.01*k, .95-.06*k, .12+.08*k);
+      for (let i=0;i<n;i++) addPetal(g, geo, M(cols[k]), i/n*TAU + k*.7 + rand(-.15,.15), .12+.24*k + rand(-.06,.06), .004+.007*k, -.007*k);
+    });
+    sepals(g, 5, -.04);
+    return g;
+  },
+  tulipe(hex){
+    const g = new THREE.Group();
+    const base = M(hex), mid = M(shade(hex,.85));
+    const g1 = petalGeo(.075,.13,1.25,-.04), g2 = petalGeo(.08,.135,1.2,-.02);
+    for (let i=0;i<3;i++) addPetal(g,g1,base,i*TAU/3,.14,.014,0);
+    for (let i=0;i<3;i++) addPetal(g,g2,mid,i*TAU/3+TAU/6,.2,.02,-.004);
+    addPetal(g, petalGeo(.05,.24,.8,.25), M(LEAF), rand(0,TAU), .5, .012, -.22);
+    return g;
+  },
+  hortensia(hex){
+    const g = new THREE.Group();
+    const cols = [M(hex), M(mix(hex,0xffffff,.18)), M(shade(hex,.88))];
+    mesh(sphereGeo(.075,12,10), M(shade(hex,.7)), g).position.y = .07;
+    const pg = petalGeo(.034,.036,.25,.05), n = 30, q = new THREE.Quaternion();
+    for (let i=0;i<n;i++){
+      const y = 1 - (i+.5)/n*1.35, rr = Math.sqrt(Math.max(0,1-y*y)), a = i*2.39996;
+      const nrm = new THREE.Vector3(rr*Math.cos(a), y, rr*Math.sin(a));
+      const f = new THREE.Group();
+      f.position.copy(nrm).multiplyScalar(.08); f.position.y += .07;
+      q.setFromUnitVectors(UP, nrm); f.quaternion.copy(q);
+      const m = cols[i%3], s = rand(0,TAU);
+      for (let k=0;k<4;k++) addPetal(f, pg, m, s+k*TAU/4, 1.3, .003, 0);
+      g.add(f);
+    }
+    return g;
+  },
+  tournesol(hex){
+    const g = new THREE.Group();
+    mesh(cylGeo(.06,.055,.02), M(0x4B2E17,.9), g).position.y = -.008;
+    const c = mesh(sphereGeo(.058,16,8), M(0x35200E,.95), g); c.scale.set(1,.28,1); c.position.y = .01;
+    const p1 = petalGeo(.036,.105,.4,.1), p2 = petalGeo(.034,.1,.45,.15);
+    for (let i=0;i<20;i++) addPetal(g,p1,M(hex),i/20*TAU,1.38,.055,0);
+    for (let i=0;i<20;i++) addPetal(g,p2,M(shade(hex,.88)),i/20*TAU+TAU/40,1.2,.05,-.004);
+    sepals(g, 8, -.015);
+    return g;
+  },
+  marguerite(hex){
+    const g = new THREE.Group();
+    const c = mesh(sphereGeo(.028,12,8), M(0xF2BE2C,.8), g); c.scale.set(1,.45,1); c.position.y = .006;
+    const p = petalGeo(.026,.09,.35,-.15);
+    for (let i=0;i<14;i++) addPetal(g,p,M(hex),i/14*TAU,1.42,.022,0);
+    for (let i=0;i<13;i++) addPetal(g,p,M(shade(hex,.93)),i/13*TAU+.2,1.28,.02,-.003);
+    sepals(g, 6, -.006);
+    return g;
+  },
+  lavande(hex){
+    const g = new THREE.Group();
+    mesh(cylGeo(.004,.004,.24), M(STEM), g);
+    const mats = [M(hex), M(shade(hex,.78)), M(mix(hex,0xffffff,.15))], sg = sphereGeo(.011,6,5);
+    for (let i=0;i<34;i++){
+      const y = .03 + i*.0062, a = i*1.9, rr = .009 + .004*(1-i/34);
+      const b = mesh(sg, mats[i%3], g);
+      b.position.set(Math.cos(a)*rr, y, Math.sin(a)*rr);
+      b.scale.set(1,1.35,1).multiplyScalar(1-.35*i/34);
+    }
+    return g;
+  },
+  gypsophile(hex){
+    const g = new THREE.Group();
+    const bm = M(0x7C9A6A), wm = M(hex,.7), wm2 = M(0xF1EFEA,.7), sg = sphereGeo(.008,6,5);
+    const q = new THREE.Quaternion();
+    function branch(from, dir, len, depth){
+      const b = mesh(cylGeo(.0022,.0025,len), bm, g);
+      b.position.copy(from); q.setFromUnitVectors(UP, dir); b.quaternion.copy(q);
+      const end = from.clone().addScaledVector(dir, len);
+      if (depth === 0){
+        for (let k=0;k<7;k++){
+          const s = mesh(sg, k%2?wm:wm2, g);
+          s.position.copy(end).add(new THREE.Vector3(rand(-.017,.017),rand(-.008,.017),rand(-.017,.017)));
+          s.scale.setScalar(rand(.7,1.2));
+        }
+      } else {
+        for (let k=0;k<2;k++){
+          const d = dir.clone().add(new THREE.Vector3(rand(-.6,.6),rand(-.1,.3),rand(-.6,.6))).normalize();
+          branch(end, d, rand(.04,.06), depth-1);
+        }
+      }
+    }
+    for (let i=0;i<5;i++){
+      const a = i/5*TAU + rand(-.3,.3);
+      const d = new THREE.Vector3(Math.cos(a)*.55, 1, Math.sin(a)*.55).normalize();
+      branch(new THREE.Vector3(0,0,0), d, rand(.06,.1), 1);
+    }
+    return g;
+  },
+  eucalyptus(hex){
+    const g = new THREE.Group();
+    mesh(cylGeo(.0035,.0045,.3), M(0x6C7F5B), g);
+    const lg = GC.leaf || (GC.leaf = new THREE.CircleGeometry(.032, 16));
+    const m1 = M(hex,.75), m2 = M(mix(hex,0xffffff,.15),.75);
+    for (let k=0;k<7;k++){
+      const y = .03 + k*.04, s = 1 - k*.08;
+      for (let j=0;j<2;j++){
+        const a = k*1.57 + j*Math.PI;
+        const l = mesh(lg, (k+j)%2 ? m1 : m2, g);
+        l.position.set(Math.sin(a)*.028*s, y, Math.cos(a)*.028*s);
+        l.rotation.order = 'YXZ'; l.rotation.set(-.35, a, 0);
+        l.scale.setScalar(s);
+      }
+    }
+    return g;
+  }
+};
+
+BUILD.renoncule = hex => {
+  const g = new THREE.Group();
+  mesh(sphereGeo(.012,8,6), M(0x9DB86A), g).position.y = .012;
+  for (let k=0;k<7;k++){
+    const n = 6 + 2*k, geo = petalGeo(.028+.008*k, .03+.006*k, 1-.05*k, .04+.02*k);
+    const m = M(k < 2 ? shade(hex,.85) : k > 4 ? mix(hex,0xffffff,.1) : hex);
+    for (let i=0;i<n;i++) addPetal(g, geo, m, i/n*TAU + k*.5, .12+.2*k, .004+.005*k, -.004*k);
+  }
+  sepals(g, 5, -.03);
+  return g;
+};
+BUILD.anemone = hex => {
+  const g = new THREE.Group();
+  const p = petalGeo(.07,.075,.4,.02), p2 = petalGeo(.066,.07,.35,0);
+  for (let i=0;i<6;i++) addPetal(g, i%2 ? p : p2, M(i%2 ? hex : shade(hex,.93)), i/6*TAU, 1.22 + (i%2)*.1, .012, -.002*(i%2));
+  const c = mesh(sphereGeo(.02,12,8), M(0x1D1A2A,.8), g); c.scale.set(1,.7,1); c.position.y = .008;
+  const sg = sphereGeo(.0045,5,4), sm = M(0x2A2438,.8);
+  for (let i=0;i<22;i++){ const a = i*2.39996, rr = .022 + (i%3)*.004; mesh(sg, sm, g).position.set(Math.cos(a)*rr, .012 + (i%2)*.004, Math.sin(a)*rr); }
+  const lg = petalGeo(.02,.06,.1,.2);
+  for (let i=0;i<6;i++) addPetal(g, lg, M(LEAF), i/6*TAU+.4, 1.9, .01, -.035);
+  return g;
+};
+BUILD.orchidee = hex => {
+  const g = new THREE.Group();
+  const bloom = s => {
+    const b = new THREE.Group();
+    const base = M(hex), lip = M(mix(hex,0xB0306A,.55)), sep = M(shade(hex,.94));
+    const sg = petalGeo(.045,.085,.2,.12), pg = petalGeo(.085,.075,.2,.1), lg = petalGeo(.038,.05,1.3,.35);
+    [0, 2.2, -2.2].forEach(a => addPetal(b, sg, sep, a, 1.42, .01, 0));
+    [1.1, -1.1].forEach(a => addPetal(b, pg, base, a, 1.5, .008, .004));
+    addPetal(b, lg, lip, Math.PI, 1.1, .012, -.004);
+    const col = mesh(sphereGeo(.009,8,6), M(0xF2D36B), b); col.position.set(0,.01,-.004); col.scale.set(1,.8,1.4);
+    b.scale.setScalar(s); return b;
+  };
+  g.add(bloom(1));
+  const b2 = bloom(.8); b2.position.set(.075,-.06,.02); b2.rotation.set(.2,0,-.5); g.add(b2);
+  const bud = mesh(sphereGeo(.018,10,8), M(mix(hex,0x9DBA6A,.35)), g); bud.position.set(.12,-.13,.03); bud.scale.set(1,1.3,1);
+  const br = new THREE.CatmullRomCurve3([new THREE.Vector3(0,-.02,0), new THREE.Vector3(.05,-.05,.01), new THREE.Vector3(.09,-.1,.025), new THREE.Vector3(.12,-.14,.03)]);
+  mesh(new THREE.TubeGeometry(br,10,.003,5,false), M(0x6E8A55), g);
+  return g;
+};
+
+function stdMat(hex, rough, metal){ return new THREE.MeshStandardMaterial({color:C(hex), roughness:rough, metalness:metal || 0}); }
+function sh(m){ m.castShadow = true; m.receiveShadow = true; return m; }
+const DBUILD = {
+  nappe(mini){
+    const g = new THREE.Group(), r = mini ? .25 : 1.1;
+    const cloth = sh(new THREE.Mesh(new THREE.CylinderGeometry(r,r,.008,72), stdMat(0xEDE5D3,.95))); cloth.position.y = .004; cloth.castShadow = false; g.add(cloth);
+    const hem = new THREE.Mesh(new THREE.TorusGeometry(r,.005,6,96), stdMat(0xD6C8AC,.9)); hem.rotation.x = Math.PI/2; hem.position.y = .007; g.add(hem);
+    return g;
+  },
+  ficelle(){
+    const g = new THREE.Group(), kraft = stdMat(0xC4A36A,.95);
+    const sp = sh(new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.05,24), kraft)); sp.position.y = .025; g.add(sp);
+    for (let k=0;k<5;k++){ const t = new THREE.Mesh(new THREE.TorusGeometry(.04,.0025,6,32), stdMat(0xB08E55,.95)); t.rotation.x = Math.PI/2; t.position.y = .007 + k*.009; g.add(t); }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(.04,.03,0), new THREE.Vector3(.1,.006,.03), new THREE.Vector3(.18,.005,-.02), new THREE.Vector3(.24,.005,.04)]),30,.0025,5,false), kraft));
+    const sc = new THREE.Group(); sc.position.set(-.12,.008,.14); sc.rotation.y = .6;
+    const bladeM = stdMat(0xC3C8CE,.25,.8), handM = stdMat(0xB8453E,.5);
+    [-1,1].forEach(s => {
+      const piv = new THREE.Group(); piv.rotation.y = s*.18;
+      const bl = sh(new THREE.Mesh(new THREE.BoxGeometry(.1,.004,.012), bladeM)); bl.position.x = .05; piv.add(bl);
+      const h = sh(new THREE.Mesh(new THREE.TorusGeometry(.02,.006,8,20), handM)); h.rotation.x = Math.PI/2; h.position.set(-.03,0,s*.014); piv.add(h);
+      sc.add(piv);
+    });
+    g.add(sc);
+    return g;
+  },
+  arrosoir(){
+    const g = new THREE.Group(), zm = stdMat(0x8FA6A8,.38,.55);
+    const body = sh(new THREE.Mesh(new THREE.CylinderGeometry(.075,.085,.15,32), zm)); body.position.y = .075; g.add(body);
+    const top = new THREE.Mesh(new THREE.CircleGeometry(.075,32), zm); top.rotation.x = -Math.PI/2; top.position.y = .1501; g.add(top);
+    const sp = sh(new THREE.Mesh(new THREE.CylinderGeometry(.008,.014,.2,12), zm)); sp.position.set(.11,.1,0); sp.rotation.z = -1; g.add(sp);
+    const rose = sh(new THREE.Mesh(new THREE.CylinderGeometry(.022,.01,.03,16), zm)); rose.position.set(.2,.158,0); rose.rotation.z = -1; g.add(rose);
+    const hd = sh(new THREE.Mesh(new THREE.TorusGeometry(.06,.008,8,24,Math.PI), zm)); hd.position.set(-.02,.15,0); g.add(hd);
+    return g;
+  },
+  plante(){
+    const g = new THREE.Group();
+    const pot = sh(new THREE.Mesh(new THREE.LatheGeometry([[0,0],[.065,0],[.085,.12],[.095,.125],[.095,.14],[.08,.14],[.078,.126],[0,.126]].map(([r,y]) => new THREE.Vector2(r,y)),32), stdMat(0xB5704F,.85)));
+    g.add(pot);
+    for (let i=0;i<12;i++){
+      const l = new THREE.Mesh(petalGeo(.1,.24,.35,.4), M(i%2 ? 0x4E7F4A : 0x5F9657,.6));
+      l.rotation.order = 'YXZ'; l.rotation.set(.2 + (i%4)*.22, i*2.39996, 0); l.position.y = .12; l.castShadow = true; g.add(l);
+    }
+    return g;
+  },
+  bougies(mini){
+    const g = new THREE.Group(), wax = stdMat(0xF3EBDA,.7);
+    const fm = new THREE.MeshBasicMaterial({color:0xFFC56B}), gm = new THREE.MeshBasicMaterial({color:0xFFB347, transparent:true, opacity:.22, depthWrite:false});
+    g.userData.flames = [];
+    [[0,0,.14],[.07,.03,.1],[.02,.08,.07]].forEach(([x,z,h]) => {
+      const c = sh(new THREE.Mesh(new THREE.CylinderGeometry(.024,.025,h,20), wax)); c.position.set(x,h/2,z); g.add(c);
+      const f = new THREE.Mesh(new THREE.ConeGeometry(.007,.026,10), fm); f.position.set(x,h+.018,z); g.add(f); g.userData.flames.push(f);
+      const gl = new THREE.Mesh(sphereGeo(.02,10,8), gm); gl.position.set(x,h+.018,z); g.add(gl);
+    });
+    if (!mini){ const pl = new THREE.PointLight(0xFFB36B,.7,1.6,2); pl.position.set(.03,.24,.03); g.add(pl); g.userData.light = pl; }
+    return g;
+  },
+  guirlande(mini){
+    const g = new THREE.Group(), N = mini ? 9 : 48, R = mini ? .3 : 1.44, pts = [];
+    const bm = new THREE.MeshBasicMaterial({color:0xFFE3A0}), bg = sphereGeo(.011,8,6);
+    g.userData.bulbs = [];
+    for (let i=0;i<N;i++){
+      const a = mini ? (i/(N-1) - .5)*1.6 : i/N*TAU;
+      const pt = new THREE.Vector3(Math.sin(a)*R, .03 + (i%2)*.008, Math.cos(a)*R); pts.push(pt);
+      const b = new THREE.Mesh(bg, bm); b.position.copy(pt).add(new THREE.Vector3(0,-.012,0)); b.scale.set(1,1.3,1); g.add(b); g.userData.bulbs.push(b);
+    }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, !mini), mini ? 40 : 240, .0025, 4, !mini), stdMat(0x3A3A36,.6)));
+    return g;
+  }
+};
+const decorObj = {};
+function applyDecor(){
+  DECOR.forEach(d => {
+    if (!S.decor.includes(d.id) || decorObj[d.id]) return;
+    const o = DBUILD[d.id](false);
+    o.position.set(d.pos[0], d.pos[1], d.pos[2]); o.rotation.y = d.pos[3];
+    scene.add(o); decorObj[d.id] = o;
+  });
+}
+function animateDecor(t){
+  const b = decorObj.bougies;
+  if (b){ b.userData.flames.forEach((f,i) => f.scale.set(1, 1 + (reduce ? 0 : .18*Math.sin(t*13 + i*2) + .08*Math.sin(t*23 + i)), 1)); if (b.userData.light) b.userData.light.intensity = .65 + (reduce ? 0 : .08*Math.sin(t*11)); }
+  const gl = decorObj.guirlande;
+  if (gl && !reduce) gl.userData.bulbs.forEach((x,i) => x.scale.setScalar(.85 + .25*(.5 + .5*Math.sin(t*2 + i*.9))));
+}
+
+/* ---------- Décor ---------- */
+const table = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,.05,80), new THREE.MeshStandardMaterial({color:C(0xC7A27A), roughness:.85}));
+table.position.y = -.025; table.receiveShadow = true; scene.add(table);
+const tableEdge = new THREE.Mesh(new THREE.TorusGeometry(1.5,.012,8,90), new THREE.MeshStandardMaterial({color:C(0xA88458), roughness:.8}));
+tableEdge.rotation.x = Math.PI/2; scene.add(tableEdge);
+[[0xF08DAE,.55,.35],[0xF6F1EA,-.5,.42],[0xF2A0BA,.7,-.1],[0x7FA597,-.62,-.25],[0xF3CD4A,.25,.62],[0xF08DAE,-.3,.7]].forEach(([h,x,z]) => {
+  const p = new THREE.Mesh(petalGeo(.05,.06,.3,.25), M(h));
+  p.position.set(x,.012,z); p.rotation.set(-Math.PI/2+.12, 0, rand(0,TAU));
+  p.receiveShadow = true; p.castShadow = true; scene.add(p);
+});
+
+const T = new THREE.Vector3(0, .5, 0);
+const VMC = {};
+function vaseMaterial(v){
+  if (VMC[v.id]) return VMC[v.id];
+  const m = new THREE.MeshStandardMaterial({color:C(v.hex), roughness:v.rough ?? .32, metalness:v.metal || 0, side:THREE.DoubleSide});
+  if (v.opacity){ m.transparent = true; m.opacity = v.opacity; m.depthWrite = false; }
+  return VMC[v.id] = m;
+}
+const vaseMat = vaseMaterial(VASES[0]);
+const prof = [[0,0],[.1,0],[.13,.03],[.16,.12],[.165,.2],[.14,.3],[.085,.4],[.075,.45],[.09,.5],[.086,.508],[.07,.49],[.06,.44]].map(([r,y]) => new THREE.Vector2(r,y));
+const vaseGeo = new THREE.LatheGeometry(prof, 64);
+const vase = new THREE.Mesh(vaseGeo, vaseMat);
+vase.castShadow = true; vase.receiveShadow = true; scene.add(vase);
+const water = new THREE.Mesh(new THREE.CircleGeometry(.068, 24), new THREE.MeshStandardMaterial({color:C(0x2A3A33), roughness:.2}));
+water.rotation.x = -Math.PI/2; water.position.y = .46; scene.add(water);
+
+const ribbonMat = new THREE.MeshStandardMaterial({color:C(RIBBONS[0].hex), roughness:.3, metalness:.05, side:THREE.DoubleSide});
+const ribbon = new THREE.Group(); scene.add(ribbon);
+(() => {
+  const band = new THREE.Mesh(new THREE.TorusGeometry(.083,.009,8,48), ribbonMat); band.rotation.x = Math.PI/2; band.position.y = .425; band.scale.set(1,1,1.6);
+  ribbon.add(band);
+  [-1,1].forEach(s => {
+    const loop = new THREE.Mesh(new THREE.TorusGeometry(.026,.007,8,24), ribbonMat);
+    loop.position.set(s*.028,.43,.094); loop.scale.set(1.25,.7,1); loop.rotation.set(0, s*.35, s*.25); ribbon.add(loop);
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(.016,.075,.003), ribbonMat);
+    tail.position.set(s*.016,.385,.095); tail.rotation.z = s*.28; ribbon.add(tail);
+  });
+  const knot = new THREE.Mesh(sphereGeo(.012,10,8), ribbonMat); knot.position.set(0,.43,.096); ribbon.add(knot);
+  ribbon.traverse(o => { if (o.isMesh) o.castShadow = true; });
+})();
+
+const WMC = {};
+function wrapMaterial(w){
+  if (WMC[w.id]) return WMC[w.id];
+  const m = new THREE.MeshStandardMaterial({color:C(w.hex), roughness:w.rough, metalness:0, side:THREE.DoubleSide});
+  if (w.opacity){ m.transparent = true; m.opacity = w.opacity; if (w.opacity < .5) m.depthWrite = false; }
+  return WMC[w.id] = m;
+}
+function wrapGeo(k, H){
+  const pos = [], idx = [], panels = 4, U = 28, V = 18, y0 = .17, yT = T.y;
+  const hf = [1.18, 1, 1.1, .94];
+  for (let p=0;p<panels;p++){
+    const base = pos.length/3, a0 = p/panels*TAU + .3, span = TAU/panels*1.5, off = p*.0035;
+    for (let v=0;v<=V;v++) for (let u=0;u<=U;u++){
+      const fu = u/U, fv = v/V, ang = a0 + fu*span;
+      const top = yT + H*hf[p]*(1 + .07*Math.sin(fu*Math.PI*3 + p*1.7));
+      const y = y0 + fv*(top - y0);
+      let r;
+      if (y <= yT) r = .056 + (yT - y)*.03;
+      else { const h = y - yT, t = h/(H*hf[p]); r = .056 + k*h*(1 + .55*t*t); }
+      const pleat = 1 + .06*Math.sin(fu*span*8 + p*2) * Math.max(0, (y - yT)/H);
+      r = (r + off)*pleat;
+      pos.push(Math.cos(ang)*r, y, Math.sin(ang)*r);
+    }
+    for (let v=0;v<V;v++) for (let u=0;u<U;u++){
+      const a = base + v*(U+1) + u, b = a + 1, c = a + U + 1, d = c + 1;
+      idx.push(a,c,b, b,c,d);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+const wrapCur = {k:.9, H:.2}, wrapTgt = {k:.9, H:.2};
+const wrapMesh = new THREE.Mesh(wrapGeo(wrapCur.k, wrapCur.H), wrapMaterial(WRAPS[0]));
+wrapMesh.castShadow = true; wrapMesh.receiveShadow = true; wrapMesh.visible = false; scene.add(wrapMesh);
+function applyPresentation(){
+  const inVase = G.pres === 'vase';
+  vase.visible = water.visible = inVase;
+  wrapMesh.visible = !inVase;
+  if (!inVase){ const w = WRAPS.find(w => w.id === G.pres); wrapMesh.material = wrapMaterial(w); wrapMesh.castShadow = !w.opacity || w.opacity > .5; }
+  ribbon.position.y = inVase ? 0 : .075;
+  ribbon.scale.set(inVase ? 1 : .76, 1, inVase ? 1 : .76);
+  items.forEach(i => i.dirty = true);
+  layout(); refresh();
+}
+
+const bouquet = new THREE.Group(); scene.add(bouquet);
+const stemMat = M(STEM, .7);
+const ring = new THREE.Mesh(new THREE.TorusGeometry(1,.035,8,64), new THREE.MeshBasicMaterial({color:C(0xC4466D), transparent:true, opacity:.9}));
+ring.visible = false; scene.add(ring);
+
+/* ---------- Vignettes ---------- */
+const THUMBS = {}, VTHUMB = {}, DTHUMB = {}, WTHUMB = {};
+let thumbR, thumbS, thumbC;
+function thumbOf(obj, dir, fill = .95){
+  if (!thumbR){
+    thumbR = new THREE.WebGLRenderer({antialias:true, alpha:true, preserveDrawingBuffer:true});
+    thumbR.setPixelRatio(1); thumbR.setSize(132,132);
+    thumbR.outputEncoding = THREE.sRGBEncoding; thumbR.toneMapping = THREE.ACESFilmicToneMapping;
+    thumbS = new THREE.Scene();
+    thumbS.add(new THREE.HemisphereLight(0xffffff, 0x8a7a6a, 1));
+    const dl = new THREE.DirectionalLight(0xfff4e6, 1.1); dl.position.set(1,2,1.5); thumbS.add(dl);
+    thumbC = new THREE.PerspectiveCamera(30, 1, .01, 20);
+  }
+  thumbS.add(obj); obj.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(obj), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3()).length();
+  thumbC.position.copy(c).addScaledVector(dir.clone().normalize(), size*.5/Math.tan(15*Math.PI/180)*fill);
+  thumbC.lookAt(c);
+  thumbR.render(thumbS, thumbC);
+  const url = thumbR.domElement.toDataURL();
+  thumbS.remove(obj);
+  return url;
+}
+function makeThumbs(){
+  for (const t of TYPES){
+    THUMBS[t] = FLOWERS[t].colors.map(([, hex]) => {
+      const g = new THREE.Group(); g.add(BUILD[t](hex));
+      if (FLOWERS[t].view === 'side'){ const s = new THREE.Mesh(cylGeo(.005,.005,.12), M(STEM)); s.position.y = -.12; g.add(s); }
+      return thumbOf(g, FLOWERS[t].view === 'top' ? new THREE.Vector3(0,1.1,.9) : new THREE.Vector3(.15,.3,1));
+    });
+  }
+  VASES.forEach(v => { VTHUMB[v.id] = thumbOf(new THREE.Mesh(vaseGeo, vaseMaterial(v)), new THREE.Vector3(0,.35,1), 1); });
+  WRAPS.forEach(w => {
+    const g = new THREE.Group(); g.add(new THREE.Mesh(wrapGeo(1.1,.22), wrapMaterial(w)));
+    const tie = new THREE.Mesh(new THREE.TorusGeometry(.063,.008,8,32), M(0xE88AA8,.4)); tie.rotation.x = Math.PI/2; tie.position.y = T.y; g.add(tie);
+    WTHUMB[w.id] = thumbOf(g, new THREE.Vector3(0,.55,1), 1);
+  });
+  DECOR.forEach(d => { DTHUMB[d.id] = thumbOf(DBUILD[d.id](true), new THREE.Vector3(.4,.75,1), 1); });
+  thumbR.dispose(); if (thumbR.forceContextLoss) thumbR.forceContextLoss();
+}
+
+/* ---------- Bouquet ---------- */
+let items = [], uid = 0, selectedId = null, lastAdd = 0;
+const live = () => items.filter(i => !i.removing);
+const maxStems = () => UPG.stems.vals[S.up.stems];
+
+function addFlower(type, ci){
+  if (live().length >= maxStems()){ toast(`Le bouquet est plein : ${maxStems()} tiges au maximum.`); return; }
+  const F = FLOWERS[type], [fam, hex] = F.colors[ci];
+  const head = BUILD[type](hex);
+  const it = {
+    id: ++uid, type, ci, fam, hex, head, stem:null,
+    key: F.prio + rand(0, 1.4), len: F.len + rand(-.03,.03),
+    stemR: type === 'tournesol' ? .008 : type === 'pivoine' ? .007 : .0055,
+    bend: new THREE.Vector3(rand(-.015,.015),0,rand(-.015,.015)),
+    cur:{pos:new THREE.Vector3(), dir:new THREE.Vector3(0,1,0)}, tgt:{pos:new THREE.Vector3(), dir:new THREE.Vector3(0,1,0)},
+    grow:0, scale: rand(.92,1.08), ph: rand(0,TAU),
+    spin: new THREE.Quaternion().setFromAxisAngle(UP, rand(0,TAU))
+  };
+  head.userData.item = it;
+  bouquet.add(head);
+  items.push(it);
+  layout();
+  it.cur.dir.copy(it.tgt.dir);
+  it.cur.pos.copy(T).addScaledVector(it.tgt.dir, .08);
+  it.dirty = true;
+  $('#hint').classList.add('gone');
+  refresh();
+}
+function removeItem(it){
+  if (!it || it.removing) return;
+  it.removing = true;
+  it.tgt.pos.copy(T).addScaledVector(it.cur.dir, .06);
+  if (selectedId === it.id) select(null);
+  layout(); refresh();
+}
+function clearAll(){ live().forEach(removeItem); }
+
+function layout(){
+  const L = live().sort((a,b) => a.key - b.key), n = L.length;
+  const maxT = Math.min(G.pres === 'vase' ? 1.24 : .88, .18 + .2*Math.sqrt(n));
+  wrapTgt.k = Math.tan(maxT)*1.1 + .25;
+  wrapTgt.H = Math.max(.12, .27*Math.cos(maxT));
+  L.forEach((it, i) => {
+    const t = n === 1 ? 0 : (i + .5)/n;
+    const th = maxT*Math.sqrt(t), ph = i*2.39996 + .6;
+    const d = new THREE.Vector3(Math.sin(th)*Math.cos(ph), Math.cos(th), Math.sin(th)*Math.sin(ph));
+    it.tgt.dir.copy(d);
+    it.tgt.pos.copy(T).addScaledVector(d, it.len * (1 - .06*t));
+  });
+}
+function rebuildStem(it){
+  const p = it.cur.pos, d = it.cur.dir, len = p.distanceTo(T);
+  const pts = [
+    p.clone().addScaledVector(d, -.012),
+    T.clone().addScaledVector(d, len*.5).add(it.bend),
+    T.clone().addScaledVector(d, .03),
+    G.pres === 'vase' ? new THREE.Vector3(-d.x*.09, .12, -d.z*.09) : new THREE.Vector3(-d.x*.16, .004, -d.z*.16)
+  ];
+  const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 18, it.stemR, 5, false);
+  if (it.stem){ it.stem.geometry.dispose(); it.stem.geometry = geo; }
+  else { it.stem = new THREE.Mesh(geo, stemMat); it.stem.castShadow = true; bouquet.add(it.stem); }
+}
+
+/* ---------- Particules ---------- */
+const bursts = [];
+function burst(){
+  const L = live(); if (!L.length || reduce) return;
+  const geo = petalGeo(.03,.035,.3,.15);
+  for (let i=0;i<70;i++){
+    const it = L[i % L.length];
+    const m = new THREE.Mesh(geo, M(it.fam === 'vert' ? 0xF2A0BA : it.hex));
+    m.position.copy(T).add(new THREE.Vector3(rand(-.15,.15), rand(.3,.6), rand(-.15,.15)));
+    m.rotation.set(rand(0,TAU),rand(0,TAU),0);
+    scene.add(m);
+    bursts.push({m, v:new THREE.Vector3(rand(-1,1), rand(1.2,2.4), rand(-1,1)), av:new THREE.Vector3(rand(-6,6),rand(-6,6),rand(-6,6)), life:0, max:rand(1.8,2.8)});
+  }
+}
+
+/* ---------- Caméra ---------- */
+const cam = {az:.5, pol:1.12, zoom:1, base:2.3, tgt:new THREE.Vector3(0,.6,0)};
+function placeCamera(){
+  const d = cam.base*cam.zoom;
+  camera.position.set(cam.tgt.x + d*Math.sin(cam.pol)*Math.sin(cam.az), cam.tgt.y + d*Math.cos(cam.pol), cam.tgt.z + d*Math.sin(cam.pol)*Math.cos(cam.az));
+  camera.lookAt(cam.tgt);
+}
+function resize(){
+  const W = innerWidth, H = innerHeight, mobile = W < 760;
+  renderer.setSize(W, H, false);
+  camera.aspect = W/H;
+  const topEdge = mobile ? $('#order').getBoundingClientRect().bottom + 6 : 60;
+  const dockTop = $('#dock').getBoundingClientRect().top;
+  $('#tools').style.bottom = mobile ? (H - dockTop + 8) + 'px' : '';
+  let bottomEdge = dockTop;
+  if (mobile) bottomEdge = Math.min(bottomEdge, $('#tools').getBoundingClientRect().top);
+  $('#hint').style.bottom = (H - bottomEdge + 14) + 'px';
+  updateArrows();
+  bottomEdge -= 6;
+  const band = Math.max(140, bottomEdge - topEdge);
+  const shift = ((H - bottomEdge) - topEdge)/2;
+  camera.setViewOffset(W, H, 0, shift, W, H);
+  const tn = Math.tan(camera.fov/2*Math.PI/180);
+  const vfit = (1.2/2)/tn * (H/band);
+  const hfit = .72/(tn*camera.aspect);
+  cam.base = Math.max(vfit, hfit, 1.7);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+
+const ptrs = new Map(); let moved = 0, pinch0 = 0, zoom0 = 1, lastInteract = 0;
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (ptrs.size === 1) moved = 0;
+  if (ptrs.size === 2){ const [a,b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x-b.x, a.y-b.y); zoom0 = cam.zoom; }
+  lastInteract = performance.now();
+});
+canvas.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (ptrs.size === 1){ cam.az -= dx*.008; cam.pol = clamp(cam.pol - dy*.006, .35, 1.45); moved += Math.abs(dx) + Math.abs(dy); }
+  else if (ptrs.size === 2){ const [a,b] = [...ptrs.values()]; const d = Math.hypot(a.x-b.x, a.y-b.y); if (d > 0) cam.zoom = clamp(zoom0*pinch0/d, .55, 1.6); moved += 99; }
+  lastInteract = performance.now();
+});
+function endPtr(e){
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if (!ptrs.size && moved < 6 && e.type === 'pointerup') pick(e.clientX, e.clientY);
+}
+canvas.addEventListener('pointerup', endPtr);
+canvas.addEventListener('pointercancel', endPtr);
+canvas.addEventListener('wheel', e => { e.preventDefault(); cam.zoom = clamp(cam.zoom*(1 + e.deltaY*.0012), .55, 1.6); lastInteract = performance.now(); }, {passive:false});
+
+const ray = new THREE.Raycaster();
+function pick(x, y){
+  const ndc = new THREE.Vector2(x/innerWidth*2 - 1, -(y/innerHeight)*2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const heads = live().map(i => i.head);
+  const hit = ray.intersectObjects(heads, true)[0];
+  if (!hit){ select(null); return; }
+  let o = hit.object; while (o && !o.userData.item) o = o.parent;
+  select(o ? o.userData.item.id : null);
+}
+function select(id){
+  selectedId = id;
+  const it = items.find(i => i.id === id);
+  $('#sel').hidden = !it;
+  if (it) $('#selName').textContent = `${FLOWERS[it.type].name} ${FLOWERS[it.type].colors.length > 1 ? FAM[it.fam].n : ''}`.trim();
+  ring.visible = !!it;
+  requestAnimationFrame(resize);
+}
+
+/* ---------- Boucle ---------- */
+const clock = new THREE.Clock(), qa = new THREE.Quaternion(), qs = new THREE.Quaternion(), ax = new THREE.Vector3();
+const easeBack = x => { const c = 1.9; return 1 + (c+1)*Math.pow(x-1,3) + c*Math.pow(x-1,2); };
+function tick(){
+  const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+  if (!reduce && !ptrs.size && performance.now() - lastInteract > 3500) cam.az += dt*.12;
+  placeCamera();
+  for (let i = items.length - 1; i >= 0; i--){
+    const it = items[i];
+    const k = Math.min(1, dt*7);
+    if (it.dirty || it.cur.pos.distanceToSquared(it.tgt.pos) > 1e-8 || it.cur.dir.distanceToSquared(it.tgt.dir) > 1e-8){
+      it.cur.pos.lerp(it.tgt.pos, k); it.cur.dir.lerp(it.tgt.dir, k).normalize();
+      rebuildStem(it); it.dirty = false;
+    }
+    it.grow = it.removing ? it.grow - dt*4.5 : Math.min(1, it.grow + dt*2.2);
+    if (it.removing && it.grow <= 0){
+      bouquet.remove(it.head); bouquet.remove(it.stem); it.stem.geometry.dispose();
+      items.splice(i, 1); continue;
+    }
+    const s = (it.removing ? Math.max(0, it.grow) : easeBack(it.grow)) * it.scale;
+    it.head.scale.setScalar(Math.max(.001, s));
+    it.stem.scale.setScalar(1);
+    it.head.position.copy(it.cur.pos);
+    qa.setFromUnitVectors(UP, it.cur.dir);
+    ax.set(Math.cos(it.ph), 0, Math.sin(it.ph));
+    qs.setFromAxisAngle(ax, reduce ? 0 : Math.sin(t*1.3 + it.ph)*.03);
+    it.head.quaternion.copy(qa).multiply(qs).multiply(it.spin);
+  }
+  const sel = items.find(i => i.id === selectedId && !i.removing);
+  if (sel){
+    const F = FLOWERS[sel.type];
+    ring.position.copy(sel.cur.pos).addScaledVector(sel.cur.dir, F.off*sel.scale);
+    ring.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), sel.cur.dir);
+    ring.scale.setScalar(F.r*1.25*sel.scale*(1 + (reduce ? 0 : Math.sin(t*5)*.05)));
+  } else ring.visible = false;
+  for (let i = bursts.length - 1; i >= 0; i--){
+    const b = bursts[i]; b.life += dt;
+    b.v.y -= 2.2*dt; b.v.multiplyScalar(1 - dt*.9);
+    b.m.position.addScaledVector(b.v, dt);
+    b.m.rotation.x += b.av.x*dt; b.m.rotation.y += b.av.y*dt;
+    b.m.scale.setScalar(clamp((b.max - b.life)/.6, 0, 1));
+    if (b.life > b.max || b.m.position.y < 0){ scene.remove(b.m); bursts.splice(i,1); }
+  }
+  animateDecor(t);
+  if (wrapMesh.visible && (Math.abs(wrapCur.k - wrapTgt.k) > .002 || Math.abs(wrapCur.H - wrapTgt.H) > .001)){
+    wrapCur.k += (wrapTgt.k - wrapCur.k)*Math.min(1, dt*6); wrapCur.H += (wrapTgt.H - wrapCur.H)*Math.min(1, dt*6);
+    wrapMesh.geometry.dispose(); wrapMesh.geometry = wrapGeo(wrapCur.k, wrapCur.H);
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+
+/* ---------- Jeu ---------- */
+const STORE = 'atelier-des-fleurs-v1';
+function loadSave(){ try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch(e){ return {}; } }
+const S = Object.assign({best:0, days:0, wallet:0, flowers:['rose','tulipe','marguerite','lavande','gypsophile','eucalyptus'],
+  vases:['porcelaine'], ribbons:['blanc','rose'], decor:[]}, loadSave());
+S.wraps = S.wraps || ['kraft'];
+S.up = Object.assign({stems:0, gros:0, tips:0, clients:0}, S.up || {});
+function persist(){ try { localStorage.setItem(STORE, JSON.stringify(S)); } catch(e){} }
+const G = {mode:'intro', day:1, idx:0, orders:[], money:0, stars:0, vase:'porcelaine', ribbon:'blanc', pres:'vase'};
+
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function listFr(arr){ return arr.length < 2 ? arr.join('') : arr.slice(0,-1).join(', ') + ' et ' + arr[arr.length-1]; }
+const unitPrice = t => FLOWERS[t].price*(1 - UPG.gros.vals[S.up.gros]);
+const cost = () => Math.round(live().reduce((s,i) => s + unitPrice(i.type), 0));
+const fmtPrice = v => (Math.round(v*10)/10).toString().replace('.', ',') + ' €';
+
+function evaluate(o){
+  const L = live(), n = L.length, res = [];
+  let s = (n >= o.min && n <= o.max) ? 1 : Math.max(0, 1 - (n < o.min ? o.min - n : n - o.max)/Math.max(3, o.min*.5));
+  res.push({label:`Entre ${o.min} et ${o.max} tiges`, w:20, s, val:`${n}`, warn:n > o.max});
+  o.req.forEach(r => {
+    const c = L.filter(i => i.type === r.t && (!r.c || i.fam === r.c)).length;
+    const lbl = `Au moins ${r.n} ${r.n > 1 ? FLOWERS[r.t].pl : FLOWERS[r.t].name.toLowerCase()}${r.c ? ' ' + (r.n > 1 ? FAM[r.c].f : FAM[r.c].n) : ''}`;
+    res.push({label:lbl, w:20, s:Math.min(1, c/r.n), val:`${c}/${r.n}`});
+  });
+  const colored = L.filter(i => i.fam !== 'vert');
+  const ratio = colored.length ? colored.filter(i => o.palette.includes(i.fam)).length/colored.length : 0;
+  res.push({label:`Tons ${listFr(o.palette.map(p => FAM[p].n))}`, w:25, s:Math.min(1, ratio/.85), val:colored.length ? `${Math.round(ratio*100)} %` : '', warn:colored.length > 0 && ratio < .85});
+  if (o.avoid){
+    const bad = L.filter(i => o.avoid.includes(i.fam)).length;
+    res.push({label:`Aucune fleur ${listFr(o.avoid.map(p => FAM[p].n))}`, w:10, s:bad ? 0 : 1, val:bad ? `${bad}` : '', warn:bad > 0});
+  }
+  if (o.green) res.push({label:'Un peu de feuillage', w:10, s:L.some(i => i.fam === 'vert') ? 1 : 0, val:''});
+  const c = cost();
+  res.push({label:`Budget de ${o.budget} €`, w:15, s:c <= o.budget ? 1 : Math.max(0, 1 - (c - o.budget)/(o.budget*.3)), val:`${c} €`, warn:c > o.budget});
+  if (o.vase){ const v = VASES.find(v => v.id === o.vase); res.push({label:`Vase ${v.name}`, w:10, s:(G.pres === 'vase' && G.vase === o.vase) ? 1 : 0, val:''}); }
+  if (o.wrap){ const w = WRAPS.find(w => w.id === o.wrap); res.push({label:`Emballage ${w.name}`, w:10, s:G.pres === o.wrap ? 1 : 0, val:''}); }
+  const tw = res.reduce((a,r) => a + r.w, 0);
+  const score = n ? Math.round(res.reduce((a,r) => a + r.w*r.s, 0)/tw*100) : 0;
+  return {res, score};
+}
+
+function renderOrder(){
+  const el = $('#order');
+  const free = G.mode === 'free';
+  $('#freeActions').hidden = !free;
+  $('#sDay').hidden = free; $('#sClient').hidden = free;
+  setMoney(S.wallet);
+  if (free){
+    $('#avatar').textContent = '✿'; $('#avatar').style.background = '#6F8E7A';
+    $('#cName').textContent = 'Composition libre';
+    $('#cOcc').textContent = 'Aucune commande en cours';
+  } else {
+    const o = G.orders[G.idx];
+    $('#avatar').textContent = o.name[0]; $('#avatar').style.background = o.color;
+    $('#cName').textContent = o.name; $('#cOcc').textContent = o.occ;
+    $('#sDay').innerHTML = `Jour <strong>${G.day}</strong>`;
+    $('#sClient').innerHTML = `Client <strong>${G.idx+1}</strong><span class="long"> sur ${G.orders.length}</span>`;
+  }
+  el.classList.remove('arrive'); void el.offsetWidth; el.classList.add('arrive');
+  setCollapsed(innerWidth < 760);
+  refresh();
+}
+function setCollapsed(c){
+  $('#order').classList.toggle('collapsed', c);
+  $('#orderToggle').setAttribute('aria-expanded', String(!c));
+  requestAnimationFrame(resize);
+}
+$('#orderToggle').addEventListener('click', () => setCollapsed(!$('#order').classList.contains('collapsed')));
+
+function refresh(){
+  const n = live().length, c = cost();
+  $('#tStems').innerHTML = `<strong>${n}</strong> tige${n > 1 ? 's' : ''}`;
+  $('#tCost').innerHTML = `<strong>${c} €</strong>`;
+  $('#deliver').disabled = n === 0;
+  $('#undo').disabled = n === 0; $('#clear').disabled = n === 0;
+  const ul = $('#checks'); ul.innerHTML = '';
+  let res;
+  if (G.mode === 'free') res = evaluateFree().res;
+  else { const o = G.orders[G.idx]; if (!o) return; res = evaluate(o).res; }
+  let ok = 0;
+  res.forEach(r => {
+    const done = r.s >= .999 && n > 0; if (done) ok++;
+    const li = document.createElement('li');
+    li.className = done ? 'ok' : (r.warn ? 'warn' : '');
+    li.innerHTML = `<span class="ic">${done ? '✓' : ''}</span><span>${r.label}</span><span class="v">${r.val}</span>`;
+    ul.appendChild(li);
+  });
+  $('#prog').textContent = `${ok}/${res.length}`;
+}
+
+function setMoney(v){ $('#sMoney').textContent = `${v} €`; }
+function countUp(el, from, to, prefix = '', suffix = ' €'){
+  if (reduce){ el.textContent = prefix + to + suffix; return; }
+  const t0 = performance.now();
+  const f = now => { const k = Math.min(1, (now - t0)/700); el.textContent = prefix + Math.round(from + (to-from)*(1 - Math.pow(1-k,3))) + suffix; if (k < 1) requestAnimationFrame(f); };
+  requestAnimationFrame(f);
+}
+
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+function evaluateFree(){
+  const L = live(), n = L.length, res = [];
+  res.push({label:'Entre 7 et 20 tiges', w:20, s:(n >= 7 && n <= 20) ? 1 : Math.max(0, 1 - (n < 7 ? 7 - n : n - 20)/5), val:`${n}`, warn:n > 20});
+  const types = new Set(L.map(i => i.type)).size;
+  res.push({label:'Au moins 3 variétés', w:20, s:Math.min(1, types/3), val:`${types}`});
+  const fams = new Set(L.filter(i => i.fam !== 'vert').map(i => i.fam)).size;
+  res.push({label:'2 ou 3 couleurs principales', w:25, s:(fams >= 2 && fams <= 3) ? 1 : (fams === 1 || fams === 4) ? .5 : 0, val:`${fams}`, warn:fams > 4});
+  res.push({label:'Un peu de feuillage', w:15, s:L.some(i => i.fam === 'vert') ? 1 : 0, val:''});
+  res.push({label:'Une fleur vedette', w:20, s:L.some(i => FLOWERS[i.type].prio === 0) ? 1 : 0, val:''});
+  const score = n ? Math.round(res.reduce((a,r) => a + r.w*r.s, 0)) : 0;
+  return {res, score};
+}
+function deliver(){
+  if (!live().length || (G.mode !== 'shop' && G.mode !== 'free')) return;
+  const free = G.mode === 'free';
+  const o = free ? null : G.orders[G.idx];
+  const {res, score} = free ? evaluateFree() : evaluate(o);
+  const stars = score >= 88 ? 3 : score >= 68 ? 2 : score >= 42 ? 1 : 0;
+  const c = cost();
+  const gross = free ? Math.round(c*(.6 + .8*score/100)) : Math.round(o.budget*score/100);
+  const tip = (!free && stars === 3) ? UPG.tips.vals[S.up.tips] : 0;
+  const amb = score > 0 ? S.decor.length : 0;
+  const earned = free ? gross + amb - c : gross + tip + amb;
+  if (stars >= 2) burst();
+  const before = S.wallet;
+  S.wallet = Math.max(0, S.wallet + earned);
+  if (!free){ G.money += earned; G.stars += stars; }
+  persist();
+  setTimeout(() => {
+    const st = $('#stars'); st.innerHTML = '';
+    for (let i=0;i<3;i++){ const d = document.createElement('span'); d.innerHTML = STAR; if (i < stars){ d.className = 'lit'; d.style.animationDelay = (.15 + i*.18) + 's'; } st.appendChild(d); }
+    st.setAttribute('aria-label', `${stars} étoile${stars > 1 ? 's' : ''} sur 3`);
+    const lines = REACT[stars];
+    $('#reaction').innerHTML = `« ${lines[Math.floor(Math.random()*lines.length)]} »<small>${free ? 'Vendu à un passant' : o.name + ', ' + o.occ.toLowerCase()}</small>`;
+    const bd = $('#breakdown'); bd.innerHTML = '';
+    res.forEach(r => {
+      const li = document.createElement('li');
+      const full = r.s >= .999;
+      li.innerHTML = `<span>${r.label}</span><span class="${full ? 'r-ok' : 'r-ko'}">${full ? '✓' : (r.s > 0 ? Math.round(r.s*100) + ' %' : '✗')}</span>`;
+      bd.appendChild(li);
+    });
+    $('#earn').textContent = '+0 €';
+    countUp($('#earn'), 0, Math.abs(earned), earned >= 0 ? '+ ' : '− ');
+    $('#scoreline').textContent = free
+      ? `Vendu ${gross + amb} €, fleurs ${c} €`
+      : `Note ${score}/100${tip ? `, pourboire ${tip} €` : ''}${amb ? `, ambiance ${amb} €` : ''}`;
+    $('#next').textContent = free ? 'Composer un autre bouquet' : G.idx >= G.orders.length - 1 ? 'Fermer la boutique' : 'Client suivant';
+    $('#result').hidden = false;
+    $('#next').focus();
+    countUp($('#sMoney'), before, S.wallet);
+    updateBadge();
+  }, stars >= 2 && !reduce ? 700 : 150);
+}
+function nextClient(){
+  $('#result').hidden = true;
+  clearAll(); select(null);
+  if (G.mode === 'free') return;
+  if (G.idx >= G.orders.length - 1){ endDay(); return; }
+  G.idx++;
+  setTimeout(renderOrder, 250);
+}
+function endDay(){
+  S.days++;
+  const isRecord = G.money > S.best && G.money > 0;
+  S.best = Math.max(S.best, G.money);
+  persist();
+  $('#sumMoney').textContent = `${G.money} €`;
+  $('#sumStars').textContent = `${G.stars} étoile${G.stars > 1 ? 's' : ''} sur ${G.orders.length*3} récoltées auprès de vos clients.`;
+  $('#sumWallet').innerHTML = `Il y a <strong>${S.wallet} €</strong> dans la caisse. De quoi passer une commande au catalogue ?`;
+  $('#sumRecord').textContent = isRecord ? 'Nouveau record de recette !' : `Record de recette : ${S.best} €`;
+  G.mode = 'closed';
+  $('#summary').hidden = false;
+}
+function pickOrders(){
+  const n = UPG.clients.vals[S.up.clients];
+  const ok = ORDERS.filter(o => o.req.every(r => S.flowers.includes(r.t)) && (!o.vase || S.vases.includes(o.vase)) && (!o.wrap || S.wraps.includes(o.wrap)));
+  let out = shuffle(ok);
+  while (out.length < n) out = out.concat(shuffle(ok));
+  return out.slice(0, n);
+}
+function hideOverlays(){ ['#intro','#summary','#result','#shop'].forEach(s => $(s).hidden = true); }
+function startShop(){
+  hideOverlays();
+  G.mode = 'shop'; G.day = S.days + 1; G.idx = 0; G.money = 0; G.stars = 0;
+  G.orders = pickOrders();
+  clearAll(); select(null);
+  renderOrder();
+  requestAnimationFrame(resize);
+}
+function startFree(){
+  hideOverlays();
+  G.mode = 'free';
+  renderOrder();
+  requestAnimationFrame(resize);
+}
+
+/* ---------- Interface ---------- */
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+
+const trayColor = {};
+function buildTray(){
+  const tray = $('#tray'); tray.innerHTML = '';
+  const order = [...TYPES.filter(t => S.flowers.includes(t)), ...TYPES.filter(t => !S.flowers.includes(t))];
+  order.forEach(t => {
+    const F = FLOWERS[t], locked = !S.flowers.includes(t);
+    let ci = trayColor[t] || 0;
+    const wrap = document.createElement('div'); wrap.className = 'fitem' + (locked ? ' locked' : '');
+    const card = document.createElement('button'); card.className = 'fcard';
+    const dots = document.createElement('div'); dots.className = 'dots';
+    if (locked){
+      card.innerHTML = `<img alt="" src="${THUMBS[t][0]}"><span class="fname">${F.name}</span><span class="fprice">${UNLOCK[t]} €</span>`;
+      card.setAttribute('aria-label', `${F.name} : à débloquer dans le catalogue pour ${UNLOCK[t]} euros`);
+      card.title = 'À débloquer dans le catalogue';
+      card.addEventListener('click', () => openShop('fleurs'));
+      wrap.append(card, dots); tray.appendChild(wrap);
+      return;
+    }
+    card.innerHTML = `<img alt="" src="${THUMBS[t][ci]}"><span class="fname">${F.name}</span><span class="fprice">${fmtPrice(unitPrice(t))}</span>`;
+    const label = () => card.setAttribute('aria-label', `Ajouter : ${F.name}${F.colors.length > 1 ? ' ' + FAM[F.colors[ci][0]].n : ''}, ${fmtPrice(unitPrice(t))}`);
+    label();
+    card.addEventListener('click', () => {
+      if (G.mode === 'intro' || G.mode === 'closed') return;
+      addFlower(t, ci);
+      card.animate && !reduce && card.animate([{transform:'scale(.92)'},{transform:'scale(1)'}], {duration:220, easing:'cubic-bezier(.2,.9,.3,1.4)'});
+    });
+    if (F.colors.length > 1){
+      F.colors.forEach(([fam, hex], i) => {
+        const d = document.createElement('button'); d.className = 'dot';
+        d.style.background = hexCss(hex);
+        d.setAttribute('aria-label', `${F.name} ${FAM[fam].n}`);
+        d.setAttribute('aria-pressed', String(i === ci));
+        d.addEventListener('click', () => {
+          ci = trayColor[t] = i; card.querySelector('img').src = THUMBS[t][i]; label();
+          dots.querySelectorAll('.dot').forEach((x, j) => x.setAttribute('aria-pressed', String(j === i)));
+        });
+        dots.appendChild(d);
+      });
+    }
+    wrap.append(card, dots); tray.appendChild(wrap);
+  });
+  updateArrows();
+}
+function buildSwatches(){
+  const mk = (list, owned, host, cur, onPick, what) => {
+    host.innerHTML = '';
+    list.filter(v => owned.includes(v.id)).forEach(v => {
+      const b = document.createElement('button'); b.className = 'sw';
+      b.style.background = v.css || hexCss(v.hex); b.title = v.name[0].toUpperCase() + v.name.slice(1);
+      b.setAttribute('aria-label', b.title);
+      b.setAttribute('aria-pressed', String(v.id === cur()));
+      b.addEventListener('click', () => { onPick(v); buildSwatches(); });
+      host.appendChild(b);
+    });
+    if (owned.length < list.length){
+      const a = document.createElement('button'); a.className = 'sw add'; a.textContent = '+';
+      a.setAttribute('aria-label', `Acheter d'autres ${what}`); a.title = `D'autres ${what} au catalogue`;
+      a.addEventListener('click', () => openShop('vases'));
+      host.appendChild(a);
+    }
+  };
+  mk(VASES, S.vases, $('#vases'), () => G.pres === 'vase' ? G.vase : null, v => { G.vase = v.id; vase.material = vaseMaterial(v); G.pres = 'vase'; applyPresentation(); }, 'vases');
+  mk(WRAPS, S.wraps, $('#wraps'), () => G.pres, w => { G.pres = w.id; applyPresentation(); }, 'emballages');
+  mk(RIBBONS, S.ribbons, $('#ribbons'), () => G.ribbon, v => { G.ribbon = v.id; ribbonMat.color.copy(C(v.hex)); }, 'rubans');
+}
+
+let shopTab = 'fleurs';
+const NOTES = {
+  fleurs:"Chaque fleur débloquée apparaît au comptoir et amène de nouveaux clients avec leurs commandes.",
+  vases:"Certains clients demandent un vase ou un emballage précis : ils ne viendront que si vous l'avez en boutique.",
+  decor:"Chaque décoration rapporte 1 € d'ambiance en plus à chaque vente.",
+  up:"Les améliorations se débloquent niveau par niveau."
+};
+function shopItems(){
+  if (shopTab === 'fleurs') return Object.keys(UNLOCK).map(t => ({
+    img:THUMBS[t][0], name:FLOWERS[t].name, desc:FDESC[t], price:UNLOCK[t], owned:S.flowers.includes(t),
+    buy:() => S.flowers.push(t), msg:`${FLOWERS[t].name} ajouté${['tournesol','hortensia'].includes(t) ? '' : 'e'} au comptoir`
+  }));
+  if (shopTab === 'vases') return [
+    ...WRAPS.filter(w => w.price).map(w => ({img:WTHUMB[w.id], name:`Emballage ${w.name}`, desc:w.desc, price:w.price, owned:S.wraps.includes(w.id),
+      buy:() => S.wraps.push(w.id), msg:`Rouleau de ${w.name} ajouté`})),
+    ...VASES.filter(v => v.price).map(v => ({img:VTHUMB[v.id], name:`Vase ${v.name}`, desc:v.desc, price:v.price, owned:S.vases.includes(v.id),
+      buy:() => S.vases.push(v.id), msg:`Vase ${v.name} posé sur l'étagère`})),
+    ...RIBBONS.filter(r => r.price).map(r => ({swatch:r.hex, name:`Ruban ${r.name.toLowerCase()}`, desc:'Un rouleau de ruban pour nouer vos bouquets.', price:r.price, owned:S.ribbons.includes(r.id),
+      buy:() => S.ribbons.push(r.id), msg:`Ruban ${r.name.toLowerCase()} ajouté`}))
+  ];
+  if (shopTab === 'decor') return DECOR.map(d => ({img:DTHUMB[d.id], name:d.name, desc:d.desc, price:d.price, owned:S.decor.includes(d.id),
+    buy:() => { S.decor.push(d.id); applyDecor(); }, msg:`${d.name} installé${d.id === 'nappe' || d.id === 'plante' || d.id === 'guirlande' ? 'e' : d.id === 'bougies' ? 'es' : ''} dans l'atelier`}));
+  return Object.entries(UPG).map(([k,u]) => {
+    const lv = S.up[k], maxed = lv >= u.cost.length;
+    return {big:u.show(u.vals[maxed ? lv : lv + 1]), name:u.name, desc:maxed ? u.done : u.desc(u.vals[lv], u.vals[lv+1]),
+      price:maxed ? 0 : u.cost[lv], owned:maxed, level:`Niveau ${lv + 1} sur ${u.vals.length}`,
+      buy:() => { S.up[k]++; }, msg:`${u.name} : niveau ${lv + 2}`};
+  });
+}
+function renderShop(){
+  $('#wallet').textContent = `${S.wallet} €`;
+  $('#shopNote').textContent = NOTES[shopTab];
+  document.querySelectorAll('#tabs .tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === shopTab)));
+  const grid = $('#shopGrid'); grid.innerHTML = '';
+  shopItems().forEach(it => {
+    const card = document.createElement('div'); card.className = 'scard' + (it.owned ? ' owned' : '');
+    const th = document.createElement('div'); th.className = 'th';
+    if (it.img) th.innerHTML = `<img alt="" src="${it.img}">`;
+    else if (it.swatch !== undefined) th.innerHTML = `<span class="swb" style="background:${hexCss(it.swatch)}"></span>`;
+    else th.innerHTML = `<span class="big">${it.big}</span>`;
+    card.appendChild(th);
+    card.insertAdjacentHTML('beforeend', `<strong>${it.name}</strong>${it.level ? `<span class="lvl">${it.level}</span>` : ''}<p>${it.desc}</p>`);
+    const b = document.createElement('button'); b.className = 'btn primary';
+    if (it.owned){ b.textContent = it.level ? 'Niveau maximum' : 'Acquis'; b.disabled = true; }
+    else if (it.price > S.wallet){ b.textContent = `Il manque ${it.price - S.wallet} €`; b.disabled = true; }
+    else {
+      b.textContent = `Acheter ${it.price} €`;
+      b.addEventListener('click', () => {
+        const before = S.wallet;
+        S.wallet -= it.price; it.buy(); persist();
+        countUp($('#sMoney'), before, S.wallet);
+        renderShop(); buildTray(); buildSwatches(); refresh(); updateBadge();
+        toast(it.msg);
+      });
+    }
+    card.appendChild(b); grid.appendChild(card);
+  });
+}
+function openShop(tab){ if (tab) shopTab = tab; renderShop(); $('#shop').hidden = false; $('#shopClose').focus(); }
+function closeShop(){ $('#shop').hidden = true; requestAnimationFrame(resize); }
+function cheapest(){
+  const prices = [
+    ...Object.keys(UNLOCK).filter(t => !S.flowers.includes(t)).map(t => UNLOCK[t]),
+    ...VASES.filter(v => !S.vases.includes(v.id)).map(v => v.price),
+    ...RIBBONS.filter(r => !S.ribbons.includes(r.id)).map(r => r.price),
+    ...WRAPS.filter(w => !S.wraps.includes(w.id)).map(w => w.price),
+    ...DECOR.filter(d => !S.decor.includes(d.id)).map(d => d.price),
+    ...Object.entries(UPG).filter(([k,u]) => S.up[k] < u.cost.length).map(([k,u]) => u.cost[S.up[k]])
+  ];
+  return prices.length ? Math.min(...prices) : Infinity;
+}
+function updateBadge(){ $('#shopBadge').hidden = S.wallet < cheapest(); }
+document.querySelectorAll('#tabs .tab').forEach(b => b.addEventListener('click', () => { shopTab = b.dataset.tab; renderShop(); }));
+$('#openShop').addEventListener('click', () => openShop());
+$('#shopClose').addEventListener('click', closeShop);
+$('#shop').addEventListener('click', e => { if (e.target.id === 'shop') closeShop(); });
+$('#sumShop').addEventListener('click', () => openShop());
+
+const trayEl = $('#tray');
+function updateArrows(){
+  const over = trayEl.scrollWidth > trayEl.clientWidth + 2;
+  $('#trayWrap').classList.toggle('fits', !over);
+  trayEl.classList.toggle('over', over);
+  $('#tLeft').disabled = trayEl.scrollLeft <= 2;
+  $('#tRight').disabled = trayEl.scrollLeft + trayEl.clientWidth >= trayEl.scrollWidth - 2;
+}
+trayEl.addEventListener('scroll', updateArrows, {passive:true});
+$('#tLeft').addEventListener('click', () => trayEl.scrollBy({left:-trayEl.clientWidth*.8, behavior:reduce ? 'auto' : 'smooth'}));
+$('#tRight').addEventListener('click', () => trayEl.scrollBy({left:trayEl.clientWidth*.8, behavior:reduce ? 'auto' : 'smooth'}));
+trayEl.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && trayEl.scrollWidth > trayEl.clientWidth){ trayEl.scrollLeft += e.deltaY; e.preventDefault(); }
+}, {passive:false});
+let tdrag = null;
+trayEl.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button === 0) tdrag = {x:e.clientX, s:trayEl.scrollLeft, moved:false}; });
+addEventListener('pointermove', e => {
+  if (!tdrag) return;
+  const dx = e.clientX - tdrag.x;
+  if (!tdrag.moved && Math.abs(dx) > 5){ tdrag.moved = true; trayEl.classList.add('dragging'); }
+  if (tdrag.moved) trayEl.scrollLeft = tdrag.s - dx;
+});
+addEventListener('pointerup', () => { if (tdrag && tdrag.moved) setTimeout(() => trayEl.classList.remove('dragging'), 0); tdrag = null; });
+
+$('#removeSel').addEventListener('click', () => removeItem(items.find(i => i.id === selectedId)));
+$('#undo').addEventListener('click', () => { const L = live(); if (L.length) removeItem(L.reduce((a,b) => a.id > b.id ? a : b)); });
+$('#clear').addEventListener('click', () => { clearAll(); select(null); });
+$('#deliver').addEventListener('click', deliver);
+$('#next').addEventListener('click', nextClient);
+$('#startShop').addEventListener('click', startShop);
+$('#startFree').addEventListener('click', startFree);
+$('#newDay').addEventListener('click', startShop);
+$('#toFree').addEventListener('click', startFree);
+$('#backShop').addEventListener('click', startShop);
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId){ removeItem(items.find(i => i.id === selectedId)); e.preventDefault(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ $('#undo').click(); e.preventDefault(); }
+  if (e.key === 'Escape'){ if (!$('#shop').hidden) closeShop(); else select(null); }
+});
+
+/* ---------- Démarrage ---------- */
+makeThumbs();
+buildTray();
+buildSwatches();
+applyDecor();
+{ const v = VASES.find(v => v.id === G.vase); vase.material = vaseMaterial(v); }
+if (S.days) $('#record').textContent = `Caisse : ${S.wallet} €. Meilleure recette : ${S.best} € en ${S.days} journée${S.days > 1 ? 's' : ''} d'ouverture.`;
+G.orders = pickOrders();
+updateBadge();
+renderOrder();
+// petit bouquet d'accueil
+[['rose',1],['pivoine',0],['eucalyptus',0],['marguerite',0],['tulipe',2],['gypsophile',0],['rose',2],['lavande',0]].forEach(([t,c]) => addFlower(t,c));
+$('#hint').classList.remove('gone');
+resize();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
+tick();
+})();
+</script>
+</body>
+</html>
